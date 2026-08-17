@@ -1,0 +1,1764 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Coffee Bar Planner</title>
+<meta name="description" content="Bar and kitchen equipment layout for Albatross Surfboards + Coffee, Agoura Hills.">
+<meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+<style>
+/* ============================================================
+   Coffee Bar Planner — drafting-table palette
+   Neutrals biased cool-green (vellum under shop light),
+   accent = drafting ink blue. Type: Avenir Next / Futura for
+   UI headings, monospace for every dimension and number.
+   ============================================================ */
+:root{
+  --paper:#E9EDEB;          /* app ground */
+  --panel:#F7F9F8;          /* rails, cards */
+  --panel-2:#EEF2F0;        /* inset wells */
+  --sheet:#FBFCFB;          /* the drawing sheet */
+  --line:#C9D2CE;           /* hairlines */
+  --line-soft:#DDE4E1;
+  --ink:#16211F;            /* primary text */
+  --ink-2:#4E5C58;          /* secondary text */
+  --ink-3:#7C8A85;          /* tertiary / ticks */
+  --accent:#1F6FA8;         /* drafting blue */
+  --accent-soft:#D5E6F1;
+  --warn:#A9691A;
+  --bad:#AE3E2C;
+  --good:#2C7358;
+  --grid:#CBD6D1;
+  --grid-major:#B4C3BD;
+  --shadow:0 1px 2px rgba(22,33,31,.08), 0 8px 24px -12px rgba(22,33,31,.28);
+
+  /* equipment category hues */
+  --c-brew:#C2582C;
+  --c-grind:#A07B1E;
+  --c-cold:#2A7CA5;
+  --c-water:#2A8B81;
+  --c-store:#77808C;
+  --c-waste:#8A5B80;
+  --c-service:#4C67AE;
+  --c-open:#8B958F;
+
+  --r:7px;
+  --font-ui:"Avenir Next","Avenir",Futura,"Segoe UI",system-ui,sans-serif;
+  --font-mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1618;
+    --panel:#161F21;
+    --panel-2:#1B2528;
+    --sheet:#121B1D;
+    --line:#2B393C;
+    --line-soft:#222E31;
+    --ink:#E4EDEA;
+    --ink-2:#A3B2AE;
+    --ink-3:#74857F;
+    --accent:#5FB2E0;
+    --accent-soft:#1C3948;
+    --warn:#D9A15A;
+    --bad:#E27C68;
+    --good:#5FBF97;
+    --grid:#243437;
+    --grid-major:#31464A;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+    --c-brew:#E08454;
+    --c-grind:#CFA53E;
+    --c-cold:#5AAFD6;
+    --c-water:#4FBDB0;
+    --c-store:#9AA6B2;
+    --c-waste:#C08CB6;
+    --c-service:#8299DA;
+    --c-open:#9CA8A2;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1618; --panel:#161F21; --panel-2:#1B2528; --sheet:#121B1D;
+  --line:#2B393C; --line-soft:#222E31; --ink:#E4EDEA; --ink-2:#A3B2AE; --ink-3:#74857F;
+  --accent:#5FB2E0; --accent-soft:#1C3948; --warn:#D9A15A; --bad:#E27C68; --good:#5FBF97;
+  --grid:#243437; --grid-major:#31464A;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+  --c-brew:#E08454; --c-grind:#CFA53E; --c-cold:#5AAFD6; --c-water:#4FBDB0;
+  --c-store:#9AA6B2; --c-waste:#C08CB6; --c-service:#8299DA; --c-open:#9CA8A2;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--font-ui); font-size:14px; line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+  height:100vh; display:flex; flex-direction:column; overflow:hidden;
+}
+button,input,select,textarea{font:inherit; color:inherit}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+  padding:10px 16px; background:var(--panel);
+  border-bottom:1px solid var(--line); box-shadow:var(--shadow); z-index:5;
+}
+.brand{display:flex; align-items:baseline; gap:10px; margin-right:auto}
+.brand h1{
+  margin:0; font-size:17px; font-weight:600; letter-spacing:.01em;
+}
+.brand .sub{
+  font-family:var(--font-mono); font-size:11px; color:var(--ink-3);
+  letter-spacing:.04em; text-transform:uppercase;
+}
+.tools{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.seg{display:flex; background:var(--panel-2); border:1px solid var(--line); border-radius:var(--r); padding:2px}
+.seg button{
+  appearance:none; border:0; background:transparent; color:var(--ink-2);
+  padding:5px 11px; border-radius:5px; cursor:pointer; font-size:13px; font-weight:500;
+}
+.seg button[aria-pressed="true"]{background:var(--accent); color:#fff}
+.btn{
+  appearance:none; background:var(--panel-2); border:1px solid var(--line);
+  border-radius:var(--r); padding:6px 11px; cursor:pointer; color:var(--ink);
+  font-size:13px; display:inline-flex; align-items:center; gap:6px;
+}
+.btn:hover{border-color:var(--accent); color:var(--accent)}
+.btn:disabled{opacity:.4; cursor:default; border-color:var(--line); color:var(--ink-3)}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+.btn.primary:hover{filter:brightness(1.08); color:#fff}
+.btn.icon{padding:6px 9px; font-family:var(--font-mono)}
+.field{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--ink-2)}
+select,input[type="number"],input[type="text"]{
+  background:var(--panel-2); border:1px solid var(--line); border-radius:6px;
+  padding:5px 7px; font-family:var(--font-mono); font-size:12px;
+}
+input[type="number"]{width:74px}
+
+/* ---------- workspace ---------- */
+.workspace{flex:1; display:grid; grid-template-columns:246px minmax(0,1fr) 296px; min-height:0}
+.rail{background:var(--panel); overflow-y:auto; display:flex; flex-direction:column}
+.rail.left{border-right:1px solid var(--line)}
+.rail.right{border-left:1px solid var(--line)}
+.rail h2{
+  margin:0; padding:12px 14px 6px; font-size:11px; font-weight:600;
+  text-transform:uppercase; letter-spacing:.1em; color:var(--ink-3);
+  font-family:var(--font-mono);
+}
+.rail .hint{padding:0 14px 10px; font-size:12px; color:var(--ink-3); line-height:1.5}
+.group{padding:0 10px 12px}
+.group-title{
+  display:flex; align-items:center; gap:7px; padding:9px 4px 5px;
+  font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--ink-2); font-family:var(--font-mono);
+}
+.swatch{width:9px; height:9px; border-radius:2px; flex:none}
+.chip{
+  width:100%; text-align:left; display:flex; align-items:baseline; gap:8px;
+  background:transparent; border:1px solid transparent; border-radius:6px;
+  padding:5px 8px; cursor:pointer;
+}
+.chip:hover{background:var(--panel-2); border-color:var(--line)}
+.chip .nm{flex:1; font-size:13px; line-height:1.3}
+.chip .nm em{display:block; font-style:normal; font-family:var(--font-mono); font-size:10px; color:var(--ink-3); letter-spacing:.01em}
+.chip .dim{font-family:var(--font-mono); font-size:11px; color:var(--ink-3); white-space:nowrap}
+.chip .bar{width:3px; align-self:stretch; border-radius:2px; flex:none}
+.chip .no{
+  font-family:var(--font-mono); font-size:10px; color:var(--ink-2);
+  background:var(--panel-2); border:1px solid var(--line); border-radius:4px;
+  min-width:22px; text-align:center; padding:1px 3px; flex:none;
+}
+.chip.isalt{margin-left:14px}
+.chip.isalt .no{background:transparent; border-style:dashed; color:var(--good)}
+.railseg{margin:0 14px 10px}
+.railseg button{flex:1}
+.approx{font-family:var(--font-mono); color:var(--ink-2)}
+.alttag{font-family:var(--font-mono); font-size:10px; color:var(--good); border:1px dashed var(--good); border-radius:4px; padding:0 3px}
+.itemno{
+  font-family:var(--font-mono); font-size:10px; color:var(--ink-2);
+  border:1px solid var(--line); border-radius:4px; padding:0 4px; margin-right:6px;
+}
+em.model{display:block; font-style:normal; font-family:var(--font-mono); font-size:10px; color:var(--ink-3)}
+.statseg{margin:2px 0 10px}
+.statseg button{flex:1; font-size:11.5px; padding:5px 4px}
+.tag{
+  font-family:var(--font-mono); font-size:9.5px; border-radius:3px; padding:1px 4px; margin-right:5px;
+}
+.tag.toorder{background:color-mix(in srgb,var(--warn) 20%,transparent); color:var(--warn)}
+.tag.ordered{background:color-mix(in srgb,var(--accent) 18%,transparent); color:var(--accent)}
+.tag.have{background:color-mix(in srgb,var(--good) 18%,transparent); color:var(--good)}
+.tolist{margin-top:8px; border-top:1px solid var(--line); padding-top:6px}
+.torow{
+  display:flex; justify-content:space-between; gap:8px; align-items:baseline;
+  font-size:12px; padding:2px 0; color:var(--ink-2);
+}
+.torow .v{font-family:var(--font-mono); font-variant-numeric:tabular-nums; color:var(--ink); white-space:nowrap}
+
+/* ---------- stage ---------- */
+.stage{position:relative; min-width:0; background:var(--paper); overflow:hidden; display:flex; flex-direction:column}
+.spacetabs{
+  display:flex; gap:2px; padding:6px 10px 0; background:var(--paper);
+  border-bottom:1px solid var(--line); overflow-x:auto; flex:none;
+}
+.spacetabs button{
+  appearance:none; background:transparent; border:1px solid transparent; border-bottom:0;
+  border-radius:6px 6px 0 0; padding:6px 13px 7px; cursor:pointer; white-space:nowrap;
+  color:var(--ink-2); font-size:13px; position:relative; top:1px;
+}
+.spacetabs button:hover{color:var(--accent)}
+.spacetabs button[aria-current="true"]{
+  background:var(--panel); border-color:var(--line); color:var(--ink); font-weight:600;
+}
+.spacetabs button .cnt{
+  font-family:var(--font-mono); font-size:10px; color:var(--ink-3); margin-left:6px;
+}
+.spacetabs .spacer{flex:1; border-bottom:1px solid var(--line); margin-bottom:-1px}
+#sheet{display:block; width:100%; flex:1; min-height:0; touch-action:none; cursor:default}
+#sheet.panning{cursor:grabbing}
+.stage .legendbar{
+  position:absolute; left:14px; bottom:14px; display:flex; gap:14px; flex-wrap:wrap;
+  background:color-mix(in srgb, var(--panel) 88%, transparent);
+  border:1px solid var(--line); border-radius:var(--r); padding:7px 11px;
+  font-family:var(--font-mono); font-size:11px; color:var(--ink-2);
+  backdrop-filter:blur(6px);
+}
+.stage .zoombox{
+  position:absolute; right:14px; bottom:14px; display:flex; gap:6px;
+}
+.badge{display:inline-flex; align-items:center; gap:6px}
+.badge i{width:16px; height:9px; border-radius:2px; display:inline-block; flex:none}
+
+/* ---------- right rail cards ---------- */
+.card{margin:10px; background:var(--panel-2); border:1px solid var(--line-soft); border-radius:var(--r); padding:11px 12px}
+.card h3{margin:0 0 9px; font-size:12px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-2); font-family:var(--font-mono)}
+.row{display:flex; align-items:center; gap:8px; margin-bottom:7px}
+.row label{flex:none; width:62px; font-size:12px; color:var(--ink-2)}
+.row input[type="text"]{flex:1; width:auto; font-family:var(--font-ui)}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:7px}
+.stat{display:flex; justify-content:space-between; align-items:baseline; padding:3px 0; border-bottom:1px dotted var(--line)}
+.stat:last-child{border-bottom:0}
+.stat .k{font-size:12px; color:var(--ink-2)}
+.stat .v{font-family:var(--font-mono); font-size:12.5px; font-variant-numeric:tabular-nums}
+p.modelline{margin:-2px 0 7px; font-family:var(--font-mono); font-size:11px; color:var(--ink-3)}
+p.notaline{
+  margin:0 0 9px; font-size:11.5px; color:var(--warn); line-height:1.4;
+  border-left:2px solid var(--warn); padding-left:7px;
+}
+.meter{height:7px; border-radius:4px; background:var(--panel); border:1px solid var(--line); overflow:hidden; display:flex; margin:5px 0 3px}
+.meter i{display:block; height:100%}
+.meter i.top{background:var(--accent)}
+.meter i.under{background:color-mix(in srgb, var(--c-cold) 70%, transparent)}
+.runline{margin-bottom:11px}
+.runline .nm{display:flex; justify-content:space-between; font-size:12px; margin-bottom:2px}
+.runline .nm b{font-weight:600}
+.runline .nm span{font-family:var(--font-mono); color:var(--ink-3); font-size:11px}
+.flag{display:flex; gap:7px; align-items:flex-start; font-size:12px; padding:5px 0; color:var(--ink-2)}
+.flag b{font-family:var(--font-mono); font-size:11px; padding:1px 5px; border-radius:4px; flex:none}
+.flag.bad b{background:color-mix(in srgb,var(--bad) 18%, transparent); color:var(--bad)}
+.flag.warn b{background:color-mix(in srgb,var(--warn) 20%, transparent); color:var(--warn)}
+.flag.ok b{background:color-mix(in srgb,var(--good) 18%, transparent); color:var(--good)}
+table.sched{width:100%; border-collapse:collapse; font-size:12px}
+table.sched th{
+  text-align:left; font-family:var(--font-mono); font-size:10px; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--ink-3); font-weight:500; padding:3px 0; border-bottom:1px solid var(--line);
+}
+table.sched td{padding:3px 0; border-bottom:1px dotted var(--line-soft); vertical-align:top}
+table.sched td.q,table.sched td.sz{font-family:var(--font-mono); font-variant-numeric:tabular-nums; white-space:nowrap}
+table.sched td.q{width:26px; color:var(--ink-2)}
+table.sched td.sz{text-align:right; color:var(--ink-3)}
+.empty{color:var(--ink-3); font-size:12px; font-style:italic}
+
+/* ---------- status ---------- */
+.status{
+  display:flex; align-items:center; gap:16px; padding:6px 16px;
+  background:var(--panel); border-top:1px solid var(--line);
+  font-family:var(--font-mono); font-size:11px; color:var(--ink-3);
+}
+.status .sp{margin-left:auto}
+.savestate{white-space:nowrap}
+.savestate.bad{color:var(--warn); font-weight:600}
+kbd{
+  font-family:var(--font-mono); font-size:10px; background:var(--panel-2);
+  border:1px solid var(--line); border-bottom-width:2px; border-radius:4px; padding:0 4px; color:var(--ink-2);
+}
+
+/* ---------- modal ---------- */
+.modal{
+  position:fixed; inset:0; background:color-mix(in srgb, var(--ink) 42%, transparent);
+  display:none; align-items:center; justify-content:center; z-index:50; padding:24px;
+}
+.modal[open]{display:flex}
+.modal .box{
+  background:var(--panel); border:1px solid var(--line); border-radius:10px;
+  box-shadow:var(--shadow); width:min(620px,100%); max-height:82vh; display:flex; flex-direction:column; padding:16px;
+}
+.modal h3{margin:0 0 4px; font-size:15px}
+.modal p{margin:0 0 10px; font-size:12.5px; color:var(--ink-2)}
+.modal textarea{
+  flex:1; min-height:230px; resize:vertical; background:var(--panel-2);
+  border:1px solid var(--line); border-radius:6px; padding:9px;
+  font-family:var(--font-mono); font-size:11px; line-height:1.5;
+}
+.modal .acts{display:flex; gap:8px; justify-content:flex-end; margin-top:11px}
+.modal .form{display:grid; grid-template-columns:1fr 1fr; gap:9px 12px; overflow-y:auto}
+.modal .form label{display:flex; flex-direction:column; gap:4px; font-size:12px; color:var(--ink-2)}
+.modal .form label.wide{grid-column:1 / -1}
+.modal .form input,.modal .form select{width:100%; box-sizing:border-box}
+.modal .err{color:var(--warn); font-size:12.5px; margin:9px 0 0; min-height:1em}
+
+/* ---------- svg drawing styles ---------- */
+#sheet .floor{fill:var(--sheet); stroke:var(--ink-3); stroke-width:1.5px; vector-effect:non-scaling-stroke}
+#sheet .space text.roomlbl{
+  fill:var(--ink-3); font-family:var(--font-mono); font-size:6px; letter-spacing:.08em; pointer-events:none;
+}
+#sheet .space.sel rect.floor{stroke:var(--accent); stroke-width:2.5px}
+#sheet g.space{cursor:move}
+#sheet .tick{stroke:var(--ink-3); stroke-width:1px; vector-effect:non-scaling-stroke; opacity:.5}
+#sheet .ticklbl{fill:var(--ink-3); font-family:var(--font-mono); font-size:9px}
+#sheet .run rect.top{fill:color-mix(in srgb, var(--ink-3) 12%, var(--sheet)); stroke:var(--ink-2); stroke-width:1.5px; vector-effect:non-scaling-stroke}
+#sheet .run text{fill:var(--ink-3); font-family:var(--font-mono); font-size:5px; letter-spacing:.06em}
+#sheet .run.sel rect.top{stroke:var(--accent); stroke-width:2.5px}
+#sheet .item rect.body{stroke-width:1.5px; vector-effect:non-scaling-stroke}
+#sheet .item text.lbl{font-family:var(--font-ui); font-size:4.4px; font-weight:600; text-anchor:middle; pointer-events:none}
+#sheet .item text.sz{font-family:var(--font-mono); font-size:3.6px; text-anchor:middle; pointer-events:none; opacity:.75}
+#sheet .item text.notxt{font-family:var(--font-mono); font-size:3.2px; text-anchor:middle; pointer-events:none}
+#sheet .item circle.nobadge{pointer-events:none}
+#sheet .item.under{opacity:.95}
+#sheet .ghost{opacity:.34}
+#sheet .ghost rect.body{stroke-dasharray:4 3}
+#sheet .item.sel rect.body{stroke:var(--accent); stroke-width:3px}
+#sheet .item.clash rect.body{stroke:var(--bad); stroke-width:3px; stroke-dasharray:5 3}
+#sheet .handle{fill:var(--accent); stroke:var(--sheet); stroke-width:1px; vector-effect:non-scaling-stroke; cursor:nwse-resize}
+#sheet .dimline{stroke:var(--accent); stroke-width:1px; vector-effect:non-scaling-stroke; opacity:.85}
+#sheet .dimtxt{fill:var(--accent); font-family:var(--font-mono); font-size:3.8px; text-anchor:middle}
+#sheet.dragging .anno{display:none}
+#sheet g.item, #sheet g.run{cursor:move}
+
+/* ---------- responsive ---------- */
+@media (max-width:1080px){
+  .workspace{grid-template-columns:206px minmax(0,1fr) 244px}
+}
+/* Narrow screens: the plan comes first, then the numbers, then the parts bin. */
+@media (max-width:760px){
+  body{height:auto; overflow:auto}
+  .workspace{display:flex; flex-direction:column}
+  .stage{order:1; height:min(58vh,460px); min-height:320px; border-bottom:1px solid var(--line)}
+  .rail.right{order:2}
+  .rail.left{order:3}
+  .rail{max-height:none; border-left:0; border-right:0; border-top:1px solid var(--line)}
+  .status{flex-wrap:wrap; gap:6px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+
+/* ---------- print ---------- */
+@media print{
+  body{height:auto; overflow:visible; background:#fff; color:#000; display:block}
+  .topbar .tools,.rail.left,.status,.zoombox,.modal,.spacetabs{display:none!important}
+  .workspace{display:block}
+  .stage{height:auto}
+  #sheet{height:78vh; border:1px solid #999}
+  .rail.right{border:0; break-inside:avoid}
+  .card{break-inside:avoid; border-color:#bbb}
+}
+</style>
+
+<header class="topbar">
+  <div class="brand">
+    <h1>Coffee Bar Planner</h1>
+    <span class="sub">albatross surfboards + coffee · countertop + undercounter</span>
+  </div>
+  <div class="tools">
+    <div class="seg" id="layerSeg" role="group" aria-label="Which layer to show">
+      <button data-layer="top" aria-pressed="false">Countertop</button>
+      <button data-layer="under" aria-pressed="false">Undercounter</button>
+      <button data-layer="both" aria-pressed="true">Both</button>
+    </div>
+    <span class="field"><label for="snap">Snap</label>
+      <select id="snap">
+        <option value="1">1 in</option>
+        <option value="3">3 in</option>
+        <option value="6">6 in</option>
+        <option value="0">off</option>
+      </select>
+    </span>
+    <button class="btn icon" id="undo" title="Undo (⌘Z)">↶</button>
+    <button class="btn icon" id="redo" title="Redo (⇧⌘Z)">↷</button>
+    <button class="btn" id="addRun">+ Counter run</button>
+    <button class="btn" id="addCustom">+ Other equipment</button>
+    <button class="btn" id="printBtn">Print</button>
+    <button class="btn" id="saveBtn">Save / Load</button>
+  </div>
+</header>
+
+<div class="workspace">
+  <aside class="rail left">
+    <h2>Equipment</h2>
+    <div class="seg railseg" id="libSeg" role="group" aria-label="Which equipment list">
+      <button data-lib="project" aria-pressed="true">This project</button>
+      <button data-lib="generic" aria-pressed="false">Standard</button>
+    </div>
+    <p class="hint">Click a piece to drop it on the plan, then drag it where it goes. It lands on whichever layer you're viewing.</p>
+    <div id="palette"></div>
+  </aside>
+
+  <section class="stage">
+    <nav class="spacetabs" id="spaceTabs" aria-label="Which space to look at"></nav>
+    <svg id="sheet" role="img" aria-label="Counter layout plan"></svg>
+    <div class="legendbar" id="legend"></div>
+    <div class="zoombox">
+      <button class="btn icon" id="zoomOut" title="Zoom out">−</button>
+      <button class="btn icon" id="zoomFit" title="Fit to view">⤢</button>
+      <button class="btn icon" id="zoomIn" title="Zoom in">+</button>
+    </div>
+  </section>
+
+  <aside class="rail right">
+    <div id="props"></div>
+    <div class="card">
+      <h3>Counter runs</h3>
+      <div id="runStats"></div>
+    </div>
+    <div class="card">
+      <h3>Check</h3>
+      <div id="flags"></div>
+    </div>
+    <div class="card">
+      <h3>Purchasing</h3>
+      <div id="buying"></div>
+    </div>
+    <div class="card">
+      <h3>Equipment schedule</h3>
+      <div id="schedule"></div>
+    </div>
+    <div class="card">
+      <h3>Rooms</h3>
+      <div id="roomList"></div>
+      <button class="btn" id="addRoom" style="margin-top:8px">+ Add a room</button>
+      <p class="hint" style="padding:8px 0 0">Rooms are scaled off sheet K-3. Click one on the plan to rename or resize it; equipment belongs to whichever room it sits in.</p>
+    </div>
+  </aside>
+</div>
+
+<footer class="status">
+  <span id="statusMsg">Click equipment on the left to add it.</span>
+  <span><kbd>R</kbd> rotate · <kbd>⌫</kbd> delete · <kbd>⌘D</kbd> duplicate · <kbd>arrows</kbd> nudge · <kbd>scroll</kbd> or <kbd>drag background</kbd> pan · <kbd>pinch</kbd> / <kbd>⌘scroll</kbd> or the <kbd>+ −</kbd> buttons zoom</span>
+  <span class="savestate sp" id="saveState"></span>
+  <span id="statusCoord"></span>
+</footer>
+
+<div class="modal" id="modal">
+  <div class="box">
+    <h3 id="modalTitle">Save / Load</h3>
+    <p id="modalNote">Copy this text somewhere safe to keep a version of the layout. To bring a layout back, paste it in and press Load.</p>
+    <textarea id="modalText" spellcheck="false"></textarea>
+    <div class="acts">
+      <button class="btn" id="mCopy">Copy</button>
+      <button class="btn" id="mLoad">Load pasted layout</button>
+      <button class="btn" id="mReset">Start over</button>
+      <button class="btn primary" id="mClose">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="customModal">
+  <div class="box">
+    <h3>Add other equipment</h3>
+    <p>For a piece that isn't in either list on the left. Measure the footprint in inches — width across the front, depth front-to-back. A round tank or barrel goes in as the square it occupies.</p>
+    <div class="form">
+      <label class="wide">What it is<input type="text" id="cName" placeholder="e.g. Water storage tank"></label>
+      <label class="wide">Make and model<input type="text" id="cModel" placeholder="optional"></label>
+      <label>Width, inches<input type="number" id="cW" min="1" max="400" step="0.25" value="24"></label>
+      <label>Depth, inches<input type="number" id="cD" min="1" max="400" step="0.25" value="24"></label>
+      <label>Height, inches<input type="number" id="cH" min="0" max="200" step="0.25" value="36"></label>
+      <label>Price, dollars<input type="number" id="cP" min="0" step="1" placeholder="optional"></label>
+      <label>Where it sits<select id="cMount">
+        <option value="floor">On the floor</option>
+        <option value="counter-top">On a countertop</option>
+        <option value="counter-under">Under a counter</option>
+        <option value="stacked">On top of another piece</option>
+      </select></label>
+      <label>Colour it as<select id="cC"></select></label>
+      <label class="wide">Have you bought it?<select id="cStatus"></select></label>
+      <label class="wide">Note<input type="text" id="cNote" placeholder="optional — anything to remember about it"></label>
+    </div>
+    <p class="err" id="cErr"></p>
+    <div class="acts">
+      <button class="btn" id="cCancel">Cancel</button>
+      <button class="btn primary" id="cAdd">Add it to the plan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+/* ============================================================
+   1. Equipment library — real-world footprints in inches (W × D)
+   ============================================================ */
+const CATS = {
+  brew:{label:"Espresso & brew", v:"--c-brew"},
+  grind:{label:"Grinding", v:"--c-grind"},
+  cold:{label:"Refrigeration & ice", v:"--c-cold"},
+  water:{label:"Sinks & water", v:"--c-water"},
+  service:{label:"Service & retail", v:"--c-service"},
+  store:{label:"Storage & millwork", v:"--c-store"},
+  waste:{label:"Waste", v:"--c-waste"},
+  open:{label:"Open space", v:"--c-open"}
+};
+
+const LIB = {
+  top:[
+    {n:"Espresso machine, 2-group", c:"brew",    w:30, d:22, h:20},
+    {n:"Espresso machine, 3-group", c:"brew",    w:40, d:22, h:20},
+    {n:"Espresso grinder",          c:"grind",   w:8,  d:16, h:26},
+    {n:"Batch grinder",             c:"grind",   w:10, d:18, h:28},
+    {n:"Knock box",                 c:"brew",    w:6,  d:6,  h:6},
+    {n:"Batch brewer",              c:"brew",    w:18, d:20, h:34},
+    {n:"Pour-over station",         c:"brew",    w:24, d:16, h:16},
+    {n:"Airpot / dispenser",        c:"brew",    w:9,  d:11, h:22},
+    {n:"Hot water tower",           c:"water",   w:8,  d:10, h:24},
+    {n:"Nitro / tap tower",         c:"cold",    w:6,  d:6,  h:14},
+    {n:"Drop-in ice bin",           c:"cold",    w:24, d:22, h:12},
+    {n:"Blender station",           c:"service", w:12, d:14, h:20},
+    {n:"Hand sink",                 c:"water",   w:14, d:14, h:0},
+    {n:"Dump sink",                 c:"water",   w:12, d:12, h:0},
+    {n:"3-compartment sink",        c:"water",   w:60, d:24, h:0},
+    {n:"POS terminal",              c:"service", w:12, d:12, h:14},
+    {n:"Cash drawer",               c:"service", w:16, d:16, h:5},
+    {n:"Pastry case (counter-top)", c:"service", w:36, d:24, h:26},
+    {n:"Condiment bar",             c:"service", w:36, d:20, h:6},
+    {n:"Merch shelf",               c:"service", w:24, d:12, h:14},
+    {n:"Toaster / oven",            c:"service", w:20, d:18, h:16},
+    {n:"Scale",                     c:"service", w:8,  d:8,  h:3},
+    {n:"Landing / work space",      c:"open",    w:18, d:24, h:0}
+  ],
+  under:[
+    {n:"Undercounter fridge, 24\"", c:"cold",  w:24, d:24, h:34},
+    {n:"Undercounter fridge, 48\"", c:"cold",  w:48, d:24, h:34},
+    {n:"Milk fridge, double",       c:"cold",  w:27, d:24, h:34},
+    {n:"Undercounter freezer",      c:"cold",  w:24, d:24, h:34},
+    {n:"Ice machine",               c:"cold",  w:30, d:24, h:34},
+    {n:"Keg cooler",                c:"cold",  w:24, d:26, h:34},
+    {n:"Undercounter dishwasher",   c:"water", w:24, d:24, h:34},
+    {n:"Water filter",              c:"water", w:12, d:12, h:24},
+    {n:"Floor drain",               c:"water", w:6,  d:6,  h:0},
+    {n:"Trash pull-out",            c:"waste", w:18, d:24, h:34},
+    {n:"Recycling pull-out",        c:"waste", w:18, d:24, h:34},
+    {n:"Espresso base cabinet",     c:"store", w:36, d:24, h:34},
+    {n:"Drawer stack",              c:"store", w:18, d:24, h:34},
+    {n:"Shelf cabinet",             c:"store", w:24, d:24, h:34},
+    {n:"Cup dispenser column",      c:"store", w:8,  d:20, h:34},
+    {n:"Syrup shelf",               c:"store", w:24, d:12, h:34},
+    {n:"Knee space (open)",         c:"open",  w:30, d:24, h:0}
+  ]
+};
+
+/* ------------------------------------------------------------
+   The actual Albatross Surfboards + Coffee (SurfaLatte) package.
+   Item numbers and models are from the LA County health-dept
+   equipment schedule, sheet K-3, 11.01.2025.
+   est:1 = footprint taken from the manufacturer's spec rather
+   than a dimension printed on the drawings — field verify.
+   ------------------------------------------------------------ */
+LIB.project = [
+  /* front / customer counter (millwork 26 + pick-up 41) */
+  {no:"41", n:"Pick-up counter zone",     m:"HUD millwork",              c:"open",    layer:"top",   w:31,   d:31,   h:0,  est:1, run:"front"},
+  {no:"37", n:"Espresso grinder",         m:"RositoBisani F5GM",         c:"grind",   layer:"top",   w:8,    d:16,   h:26, est:1, run:"front"},
+  {no:"36", n:"Knock box",                m:"Espresso Parts EPKB665B",   c:"brew",    layer:"top",   w:6,    d:6,    h:5,  p:43,   run:"front"},
+  {no:"33", n:"Espresso machine, 2-group",m:"La Marzocco Linea PB 2 AV", c:"brew",    layer:"top",   w:28,   d:23,   h:21, est:1, p:22050, run:"front"},
+  {no:"28", n:"Sneeze guard",             m:"HUD, stationary",           c:"service", layer:"top",   w:52,   d:4,    h:18, est:1, run:"front"},
+  {no:"31", n:"Drip trough",              m:"Glastender DI-RF12",        c:"water",   layer:"top",   w:12,   d:7,    h:3.5,p:350,  run:"front"},
+  {no:"30", n:"Drop-in ice bin",          m:"BK Resources BK-DIBL-1218", c:"cold",    layer:"top",   w:12,   d:18,   h:12,        run:"front"},
+  {no:"29", n:"Pastry display case",      m:"Cal-Mil 22322-99",          c:"service", layer:"top",   w:44,   d:20,   h:24, est:1, run:"front"},
+  {no:"27", n:"POS system with printer",  m:"By owner",                  c:"service", layer:"top",   w:14,   d:14,   h:14, est:1, run:"order"},
+  {no:"40", n:"Undercounter refrigerator",m:"True TUC-27-HC",            c:"cold",    layer:"under", w:27.63,d:30.13,h:35,        run:"front"},
+  {no:"39", n:"Nugget ice maker + bin",   m:"Scotsman UN324A-1",         c:"cold",    layer:"under", w:26,   d:24,   h:34, est:1, run:"front"},
+  {no:"32", n:"Undercounter freezer",     m:"True TUC-27F-HC",           c:"cold",    layer:"under", w:27.63,d:30.13,h:29.75, p:3038, run:"front"},
+  {no:"43", n:"Reverse osmosis system",   m:"Everpure EV997700",         c:"water",   layer:"under", w:16,   d:10,   h:24, est:1, run:"front"},
+  {no:"38", n:"Trash receptacle",         m:"Rubbermaid FG354060",       c:"waste",   layer:"under", w:22,   d:11,   h:30, est:1, run:"front"},
+  /* back bar (millwork 16) */
+  {no:"17", n:"Hand sink",                m:"Krowne HS-1220",            c:"water",   layer:"top",   w:12,   d:20,   h:0,  est:1, run:"back"},
+  {no:"18", n:"Hand sink",                m:"Krowne HS-1317",            c:"water",   layer:"top",   w:13,   d:17,   h:0,  est:1, run:"back"},
+  {no:"19", n:"Blender container rinser", m:"Vitamix 001442",            c:"water",   layer:"top",   w:6,    d:6,    h:8,  est:1, run:"back"},
+  {no:"20", n:"Coffee grinder, bulk",     m:"Curtis ILGD-10",            c:"grind",   layer:"top",   w:11,   d:18,   h:28, est:1, run:"back"},
+  {no:"21", n:"Coffee / tea brewer",      m:"Curtis CBHT",               c:"brew",    layer:"top",   w:18,   d:22,   h:34, est:1, run:"back"},
+  {no:"24", n:"Tea / coffee dispenser",   m:"Curtis TCN",                c:"brew",    layer:"top",   w:10,   d:12,   h:22, est:1, run:"back"},
+  {no:"25", n:"Cold-brew / nitro dispenser",m:"Summit SBC682CMTWIN",     c:"cold",    layer:"under", w:23.75,d:24,   h:33.63, p:2299, run:"back"},
+  /* back of house — floor-standing, so they aren't measured against a counter */
+  {no:"9",  n:"Corner sink, 3-compartment",m:"Eagle C314-10-3-12",       c:"water",   layer:"top",   w:43,   d:39,   h:37.5, p:3239, run:"boh", mount:"floor"},
+  {no:"12", n:"One-compartment prep sink",m:"Turbo Air TSA-1-12-R1",     c:"water",   layer:"top",   w:30,   d:24,   h:36, est:1, p:1200, run:"boh", mount:"floor"},
+  {no:"8",  n:"Hand sink",                m:"Wall-mount, NSF",           c:"water",   layer:"top",   w:17,   d:15,   h:0,  est:1, p:135,  run:"boh", mount:"floor"},
+  {no:"7",  n:"Mop sink cabinet",         m:"Stainless cabinet w/ faucet",c:"water",  layer:"top",   w:25.25,d:22.63,h:84, est:1, p:2031, run:"boh", mount:"floor"},
+  {no:"15", n:"Refrigerated work top",    m:"True TWT-48-HC",            c:"cold",    layer:"top",   w:48.4, d:30,   h:33.4, p:3897, run:"boh", mount:"floor"},
+  {no:"14", n:"Wall shelf, 36\"",         m:"Advance Tabco WS-10-36",    c:"store",   layer:"top",   w:36,   d:10,   h:0,         run:"boh", mount:"floor"},
+  {no:"14.1",n:"Wall shelf, 24\"",        m:"Advance Tabco WS-10-24",    c:"store",   layer:"top",   w:24,   d:10,   h:0,         run:"boh", mount:"floor"},
+  {no:"2",  n:"Wire shelving, 54\"",      m:"Quantum WR86-1854BK-5",     c:"store",   layer:"top",   w:54,   d:18,   h:86,        run:"boh", mount:"floor"},
+  {no:"3",  n:"Wire shelving, 30\"",      m:"Quantum WR86-1830BK-5",     c:"store",   layer:"top",   w:30,   d:18,   h:86,        run:"boh", mount:"floor"},
+  {no:"4",  n:"Wire shelving, 48\"",      m:"Quantum WR86-1848BK-5",     c:"store",   layer:"top",   w:48,   d:18,   h:86,        run:"boh", mount:"floor"},
+  {no:"6",  n:"Tankless water heater",    m:"Takagi T-H3M-DV-P",         c:"water",   layer:"top",   w:14,   d:9,    h:21, est:1, run:"boh", mount:"floor"},
+  {no:"45", n:"RO water storage tank",    m:"RO Superstore 44 gal steel",c:"water",   layer:"top",   w:22,   d:22,   h:36, est:1, p:590, run:"boh", mount:"floor",
+   note:"Already owned. 44 gal nominal, about 30 gal usable. Round tank 22\" across — the 22×22 footprint is the square it occupies. 1¼\" stainless connection; buffers the RO system (43). NOT on the approved K-3 schedule."},
+  {no:"5",  n:"Locker",                   m:"Winholt WL-66",             c:"store",   layer:"top",   w:15,   d:18,   h:66, est:1, run:"boh", mount:"floor"},
+  {no:"1",  n:"Air curtain",              m:"Mars N236-1UA-OB",          c:"service", layer:"top",   w:36,   d:10,   h:0,  est:1, run:"boh", mount:"floor"},
+  {no:"42", n:"Condiment counter",        m:"HUD millwork",              c:"service", layer:"top",   w:36,   d:24,   h:36, est:1, run:"retail"},
+  /* Not on the approved K-3 schedule — added Aug 2026. Ventless, so no hood,
+     but it is added cooking equipment on a stamped plan. */
+  {no:"44", n:"Rapid-cook oven",          m:"TurboChef Eco (ECOH)",      c:"brew",    layer:"top",   w:16.125,d:23.5, h:21.5, p:8251, run:"boh", mount:"stacked",
+   note:"Sits on the work top (15) in the scullery. New scope: needs a dedicated 208-240V 20A circuit (L6-20P) run to the scullery, and a health-dept plan revision. Confirm TurboChef's clearances and the work top's load rating before committing."},
+  {no:"44a",n:"Rapid-cook oven (alt)",    m:"TurboChef Sota (SOTAM)",    c:"brew",    layer:"top",   w:16,   d:29.8, h:25, p:13717, alt:"44", run:"boh",
+   note:"Same cavity as the Eco but 6.3\" deeper and 30A. At 29.8\" deep it overhangs the 30\" work top with nothing to spare."},
+
+  /* Cost-saving alternates from the purchase list — drop one in beside the
+     specified unit to see whether the swap still fits the millwork. */
+  {no:"32a",n:"Undercounter freezer (alt)",m:"Atosa AUF27SD",            c:"cold",    layer:"under", w:27.5, d:30,   h:32.5, p:1632, save:1406, alt:"32", run:"front",
+   note:"2.75\" taller than the True — check counter clearance."},
+  {no:"31a",n:"Drip trough (alt)",        m:"Eagle DIGRT-12",            c:"water",   layer:"top",   w:14,   d:7,    h:3.5, est:1, p:265, save:85, alt:"31", run:"front",
+   note:"14\" wide vs 12\" — verify countertop cutout."},
+  {no:"9a", n:"Corner sink, 3-comp (alt)",m:"Regency 600S3141414XC",     c:"water",   layer:"top",   w:44.5, d:44.5, h:0,  est:1, p:759, save:2480, alt:"9", run:"boh",
+   note:"Larger 14\" bowls, bigger corner footprint — confirm clearances and health-plan approval."},
+  {no:"12a",n:"Prep sink (alt)",          m:"Prepline XS1C-1416-R",      c:"water",   layer:"top",   w:28,   d:24,   h:0,  est:1, p:580, save:620, alt:"12", run:"boh",
+   note:"Bowl may be smaller than the plan calls for — verify before ordering."},
+  {no:"15a",n:"Refrigerated work top (alt)",m:"Atosa AWR48SD",           c:"cold",    layer:"top",   w:48.3, d:30,   h:39.8, est:1, p:2119, save:1778, alt:"15", run:"boh", mount:"floor",
+   note:"Same 48\"×30\" footprint as the True, so it drops straight in. Has a foamed-in backsplash — 39.8\" overall, work surface about 35\", and the splash eats the back few inches of the top. 12.2 cu ft vs 12.0. Warranty is 3 yr parts/labour against True's 7."}
+];
+const PROJ = no => LIB.project.find(r => r.no === no);
+
+/* Purchasing status. The spreadsheet is titled "remaining items needed to
+   purchase", so everything on it starts as still-to-order and everything else
+   on K-3 starts as already covered. One click per item changes either. */
+const TO_ORDER = ["7","8","9","12","25","31","32","33","36","44","9a","12a","15a","31a","32a","44a"];
+LIB.project.forEach(r => r.status = TO_ORDER.includes(r.no) ? "toorder" : "have");
+const STATUS = {
+  have:    {label:"Have it",       short:"HAVE",  v:"--good"},
+  ordered: {label:"On order",      short:"ORD",   v:"--accent"},
+  toorder: {label:"Need to order", short:"ORDER", v:"--warn"}
+};
+
+/* ============================================================
+   2. State
+   ============================================================ */
+const KEY = "coffee-bar-planner-v1";
+let uid = 1;
+const nid = () => "x" + (uid++);
+
+/* The service area as drawn on K-3: front counter along the retail side,
+   back bar against the wall, order counter closing the right end.
+   Counter sizes are scaled off the ¼"=1'-0" sheets; the 2'-7" counter
+   depth matches the architect's dimension string on CD-2.2. */
+/* Every room sits on one floor grid, scaled off K-3, so the tabs are just
+   windows onto the same drawing — nothing is duplicated between them. */
+const ORIGIN = {
+  front:{x:415, y:10}, back:{x:414, y:97}, order:{x:564, y:41}, retail:{x:478, y:-52},
+  scullery:{x:236, y:32}, storage:{x:4, y:53}
+};
+const SPACES = [
+  {key:"bar",      name:"Coffee bar",      x:400, y:-60, w:210, d:195, tab:1},
+  {key:"scullery", name:"Scullery & prep", x:236, y:32,  w:140, d:92,  tab:1},
+  {key:"storage",  name:"Storage",         x:4,   y:53,  w:116, d:71,  tab:1},
+  {key:"restroom", name:"ADA restroom",    x:123, y:27,  w:102, d:98,  tab:0}
+];
+
+function starter(){
+  uid = 1;
+  const spaces = SPACES.map(s => Object.assign({id:nid(), kind:"space", rot:0}, s));
+  const runs = [
+    {id:nid(), kind:"run", name:"Front counter (26)",   x:ORIGIN.front.x,  y:ORIGIN.front.y,  w:178, d:31, rot:0},
+    {id:nid(), kind:"run", name:"Order counter (26)",   x:ORIGIN.order.x,  y:ORIGIN.order.y,  w:29,  d:82, rot:0},
+    {id:nid(), kind:"run", name:"Back bar (16)",        x:ORIGIN.back.x,   y:ORIGIN.back.y,   w:149, d:25, rot:0},
+    {id:nid(), kind:"run", name:"Condiment counter (42)",x:ORIGIN.retail.x,y:ORIGIN.retail.y, w:36,  d:24, rot:0}
+  ];
+  /* x,y are measured from the top-left corner of the named counter */
+  const place = (no, where, x, y, layerOverride, turned) => {
+    const r = PROJ(no);
+    return {id:nid(), kind:"item", layer:layerOverride || r.layer, name:r.n, no:r.no, model:r.m,
+            est:r.est || 0, p:r.p || 0, note:r.note || "", c:r.c,
+            mount:r.mount || "counter", status:r.status || "have",
+            x:ORIGIN[where].x + x, y:ORIGIN[where].y + y,
+            w:turned ? r.d : r.w, d:turned ? r.w : r.d, h:r.h, rot:0};
+  };
+  const items = [
+    /* front counter — on top */
+    place("41","front",   0,  0),
+    place("37","front",  62,  5),
+    place("36","front",  62, 23),
+    place("33","front",  75,  5),
+    place("28","front",  78,  0),
+    place("30","front", 113,  6),
+    place("31","front", 107, 24),
+    place("29","front", 130,  5),
+    /* front counter — underneath */
+    /* the True units are 30⅛" deep in a 31" counter — almost no slack */
+    place("40","front",   1,  0.4),
+    place("39","front",  31,  1),
+    place("38","front",  59,  8),
+    place("32","front",  83,  0.4),
+    place("43","front", 145,  2),
+    /* order counter */
+    place("27","order",   8, 30),
+    /* back bar — on top */
+    place("17","back",   60,  3),
+    place("18","back",   74,  4),
+    place("19","back",   88,  5),
+    place("20","back",   96,  4),
+    place("21","back",  109,  2),
+    place("24","back",  128,  6),
+    /* back bar — underneath */
+    place("25","back",  121,  1),
+    /* retail side */
+    place("38","retail",  2,  1),
+    /* scullery & prep — everything here stands on the floor */
+    place("7", "scullery",   4,  2),
+    place("6", "scullery",  71,  1),
+    place("6", "scullery",  95,  1),
+    place("5", "scullery", 115,  3),
+    place("8", "scullery",   7, 31),
+    place("9", "scullery",   4, 50),
+    place("12","scullery",  50, 66),
+    place("15","scullery",  91, 61),
+    /* the oven sits on the work top (15), not on the front counter — 16" of the
+       work top's 48", leaving landing space either side */
+    place("44","scullery", 107, 64),
+    /* storage — 97.5 linear feet of wire shelving per the K-3 note */
+    place("3", "storage",   2,  2, null, 1),
+    place("2", "storage",  24,  2),
+    place("4", "storage",  96,  2, null, 1),
+    place("2", "storage",   2, 51),
+    place("2", "storage",  58, 51)
+  ];
+  return {spaces, runs, items, layer:"both", space:spaces[0].id, snap:1, libTab:"project", uid};
+}
+
+let S = starter();
+let sel = null;                  // {kind:'item'|'run', id}
+let hist = [], hpos = -1;
+const svg = document.getElementById("sheet");
+let view = {x:0, y:0, w:300, h:200};
+
+/* ============================================================
+   3. Small helpers
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const round = (v,s) => s > 0 ? Math.round(v/s)*s : Math.round(v*8)/8;
+
+function fmtIn(v){
+  const n = Math.round(v*8)/8;
+  const ft = Math.floor(Math.abs(n)/12), inch = Math.abs(n) - ft*12;
+  const sign = n < 0 ? "-" : "";
+  const inTxt = (Math.round(inch*8)/8).toString().replace(/\.0+$/,"");
+  if (ft === 0) return sign + inTxt + '"';
+  return sign + ft + "' " + (inch ? inTxt + '"' : '0"');
+}
+const fmtFt = v => (v/12).toFixed(1) + " ft";
+const catVar = c => `var(${CATS[c].v})`;
+
+function all(){ return S.spaces.concat(S.runs, S.items); }
+
+/* ---- spaces: which room am I looking at, and what lives in it ---- */
+function activeSpace(){ return S.space === "all" ? null : S.spaces.find(s => s.id === S.space); }
+function centerIn(o, sp){
+  const cx = o.x + o.w/2, cy = o.y + o.d/2;
+  return cx >= sp.x && cx <= sp.x + sp.w && cy >= sp.y && cy <= sp.y + sp.d;
+}
+function inView(o){
+  const sp = activeSpace();
+  return !sp || centerIn(o, sp);
+}
+function spaceOf(o){ return S.spaces.find(sp => centerIn(o, sp)) || null; }
+function viewRuns(){ return S.runs.filter(inView); }
+function viewItems(){ return S.items.filter(inView); }
+function find(id){ return all().find(o => o.id === id); }
+function selObj(){ return sel ? find(sel.id) : null; }
+
+/* oriented rectangle corners */
+function corners(o){
+  const cx = o.x + o.w/2, cy = o.y + o.d/2;
+  const a = (o.rot||0) * Math.PI/180, cos = Math.cos(a), sin = Math.sin(a);
+  return [[o.x,o.y],[o.x+o.w,o.y],[o.x+o.w,o.y+o.d],[o.x,o.y+o.d]].map(([px,py]) => {
+    const dx = px-cx, dy = py-cy;
+    return [cx + dx*cos - dy*sin, cy + dx*sin + dy*cos];
+  });
+}
+function bbox(o){
+  const pts = corners(o), xs = pts.map(p=>p[0]), ys = pts.map(p=>p[1]);
+  return {x0:Math.min(...xs), y0:Math.min(...ys), x1:Math.max(...xs), y1:Math.max(...ys)};
+}
+/* separating-axis overlap test for two oriented rects */
+function overlaps(a, b){
+  const A = corners(a), B = corners(b);
+  for (const poly of [A,B]){
+    for (let i=0;i<4;i++){
+      const p1 = poly[i], p2 = poly[(i+1)%4];
+      const ax = -(p2[1]-p1[1]), ay = p2[0]-p1[0];
+      let a0=Infinity,a1=-Infinity,b0=Infinity,b1=-Infinity;
+      for (const p of A){ const v = p[0]*ax + p[1]*ay; a0=Math.min(a0,v); a1=Math.max(a1,v); }
+      for (const p of B){ const v = p[0]*ax + p[1]*ay; b0=Math.min(b0,v); b1=Math.max(b1,v); }
+      if (a1 - b0 < 0.25 || b1 - a0 < 0.25) return false;   /* 1/4" tolerance */
+    }
+  }
+  return true;
+}
+function pointInRect(px, py, o){
+  const cx = o.x + o.w/2, cy = o.y + o.d/2;
+  const a = -(o.rot||0) * Math.PI/180, cos = Math.cos(a), sin = Math.sin(a);
+  const dx = px-cx, dy = py-cy;
+  const lx = cx + dx*cos - dy*sin, ly = cy + dx*sin + dy*cos;
+  return lx >= o.x-0.01 && lx <= o.x+o.w+0.01 && ly >= o.y-0.01 && ly <= o.y+o.d+0.01;
+}
+function runUnder(item){
+  const cx = item.x + item.w/2, cy = item.y + item.d/2;
+  return S.runs.find(r => pointInRect(cx, cy, r)) || null;
+}
+
+/* ============================================================
+   4. History
+   ============================================================ */
+function snapshot(){
+  const copy = JSON.stringify({spaces:S.spaces, runs:S.runs, items:S.items, uid});
+  if (hist[hpos] === copy) return;
+  hist = hist.slice(0, hpos+1);
+  hist.push(copy);
+  if (hist.length > 60) hist.shift();
+  hpos = hist.length - 1;
+  persist();
+  updateHistBtns();
+}
+function applyHist(i){
+  if (i < 0 || i >= hist.length) return;
+  hpos = i;
+  const d = JSON.parse(hist[i]);
+  S.spaces = d.spaces; S.runs = d.runs; S.items = d.items; uid = d.uid || uid;
+  if (!S.spaces.some(s => s.id === S.space)) S.space = "all";
+  if (sel && !find(sel.id)) sel = null;
+  persist(); render(); updateHistBtns();
+}
+function updateHistBtns(){
+  $("undo").disabled = hpos <= 0;
+  $("redo").disabled = hpos >= hist.length - 1;
+}
+/* Autosave used to fail silently, and a silent failure looks exactly like a
+   save — some browsers block storage on files opened straight off the disk.
+   So report either way, in the bottom bar. */
+function persist(){
+  let ok = true;
+  try{ localStorage.setItem(KEY, JSON.stringify({spaces:S.spaces, runs:S.runs, items:S.items, uid, layer:S.layer, libTab:S.libTab, space:S.space})); }
+  catch(e){ ok = false; }
+  showSave(ok);
+}
+function showSave(ok){
+  const el = $("saveState");
+  if (!el) return;
+  el.className = "savestate sp" + (ok ? "" : " bad");
+  el.textContent = ok
+    ? "Saved " + new Date().toLocaleTimeString([], {hour:"numeric", minute:"2-digit"})
+    : "⚠ NOT SAVING — this browser is blocking storage. Use Save / Load to keep a copy.";
+  el.title = ok
+    ? "Your layout is kept in this browser, on this computer. Another browser, or another machine, has its own copy."
+    : "Nothing is being kept between reloads. Press Save / Load and copy the text out before you close the tab.";
+}
+function restore(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return false;
+    const d = JSON.parse(raw);
+    if (!d || !Array.isArray(d.runs) || !Array.isArray(d.items) || !Array.isArray(d.spaces)) return false;
+    S.spaces = d.spaces; S.runs = d.runs; S.items = d.items;
+    /* How a piece is supported is a fact about the equipment, not about this
+       layout — so take it from the library, and a correction here reaches
+       layouts that were saved before it. Position and status stay yours. */
+    S.items.forEach(i => {
+      const r = i.no && PROJ(i.no);
+      if (r) i.mount = r.mount || "counter";
+    });
+    S.layer = d.layer || "both"; S.libTab = d.libTab || "project"; uid = d.uid || 500;
+    S.space = d.space && (d.space === "all" || S.spaces.some(s => s.id === d.space)) ? d.space : "all";
+    return true;
+  }catch(e){ return false; }
+}
+
+/* ============================================================
+   5. Palette
+   ============================================================ */
+function renderPalette(){
+  const wrap = $("palette");
+  wrap.innerHTML = "";
+  if (S.libTab === "project"){ renderProjectPalette(wrap); return; }
+  for (const layer of ["top","under"]){
+    const sect = document.createElement("div");
+    sect.className = "group";
+    const head = document.createElement("div");
+    head.className = "group-title";
+    head.textContent = layer === "top" ? "On the countertop" : "Under the counter";
+    sect.appendChild(head);
+
+    const byCat = {};
+    LIB[layer].forEach(r => (byCat[r.c] = byCat[r.c] || []).push(r));
+    for (const c of Object.keys(CATS)){
+      if (!byCat[c]) continue;
+      const ch = document.createElement("div");
+      ch.className = "group-title";
+      ch.style.opacity = ".8";
+      ch.innerHTML = `<span class="swatch" style="background:${catVar(c)}"></span>${CATS[c].label}`;
+      sect.appendChild(ch);
+      byCat[c].forEach(r => {
+        const b = document.createElement("button");
+        b.className = "chip";
+        b.type = "button";
+        b.innerHTML = `<span class="bar" style="background:${catVar(r.c)}"></span>
+                       <span class="nm">${r.n}</span>
+                       <span class="dim">${r.w}×${r.d}</span>`;
+        b.addEventListener("click", () => addItem(layer, r));
+        sect.appendChild(b);
+      });
+    }
+    wrap.appendChild(sect);
+  }
+}
+
+/* The project palette keeps the schedule's own grouping: which counter each
+   numbered item belongs to on K-3. */
+const RUN_GROUPS = [
+  {key:"front",  label:"Front counter — 26 / 41"},
+  {key:"order",  label:"Order counter"},
+  {key:"back",   label:"Back bar — 16"},
+  {key:"retail", label:"Retail side"},
+  {key:"boh",    label:"Scullery, prep & storage"}
+];
+function renderProjectPalette(wrap){
+  RUN_GROUPS.forEach(grp => {
+    const rows = LIB.project.filter(r => r.run === grp.key && !r.alt);
+    if (!rows.length) return;
+    const sect = document.createElement("div");
+    sect.className = "group";
+    const head = document.createElement("div");
+    head.className = "group-title";
+    head.textContent = grp.label;
+    sect.appendChild(head);
+    rows.forEach(r => {
+      sect.appendChild(projChip(r));
+      /* a cheaper substitute sits directly under the unit it replaces */
+      LIB.project.filter(a => a.alt === r.no).forEach(a => sect.appendChild(projChip(a)));
+    });
+    wrap.appendChild(sect);
+  });
+  const note = document.createElement("p");
+  note.className = "hint";
+  note.innerHTML = `<b class="approx">≈</b> footprint is off the manufacturer's spec sheet, not a dimension printed on the drawings — verify before ordering millwork.
+    <br><b class="alttag">ALT</b> is an alternative to the piece above it, with the price difference. Drop one in beside the specified unit to see whether it still fits.`;
+  wrap.appendChild(note);
+}
+function projChip(r){
+  const b = document.createElement("button");
+  b.className = "chip" + (r.alt ? " isalt" : "");
+  b.type = "button";
+  b.title = (r.note ? r.note + " " : "") + `${r.m} · ${r.layer === "top" ? "on the countertop" : "under the counter"}`;
+  let money = "";
+  if (r.save) money = ` · saves $${r.save.toLocaleString()}`;
+  else if (r.alt){
+    const base = PROJ(r.alt);
+    if (base && base.p && r.p) money = ` · ${r.p > base.p ? "+" : "−"}$${Math.abs(r.p - base.p).toLocaleString()}`;
+  }
+  b.innerHTML = `<span class="bar" style="background:${catVar(r.c)}"></span>
+                 <span class="no">${r.alt ? "ALT" : r.no}</span>
+                 <span class="nm">${escapeHtml(r.n)}<em>${escapeHtml(r.m)}${money}</em></span>
+                 <span class="dim">${r.est ? "≈" : ""}${r.w}×${r.d}</span>`;
+  b.addEventListener("click", () => addItem(r.layer, r));
+  return b;
+}
+
+/* `force` is for the add-your-own dialog, where you've already said which
+   layer the piece belongs on — don't let the current view override it. */
+function addItem(layer, row, force){
+  const target = force ? layer : ((S.layer === "both") ? layer : S.layer);
+  const cx = view.x + view.w/2, cy = view.y + view.h/2;
+  const it = {
+    id:nid(), kind:"item", layer:target, name:row.n, c:row.c,
+    no:row.no || "", model:row.m || "", est:row.est || 0,
+    p:row.p || 0, note:row.note || "",
+    mount:row.mount || "counter", status:row.status || "have",
+    x:round(cx - row.w/2, S.snap), y:round(cy - row.d/2, S.snap),
+    w:row.w, d:row.d, h:row.h, rot:0
+  };
+  S.items.push(it);
+  sel = {kind:"item", id:it.id};
+  snapshot(); render();
+  status(`Added ${row.no ? row.no + " " : ""}${row.n} — drag it into place.`);
+}
+
+/* ============================================================
+   6. Drawing
+   ============================================================ */
+function svgEl(tag, attrs, cls){
+  const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (cls) e.setAttribute("class", cls);
+  return e;
+}
+
+function render(){
+  // viewBox
+  const r = svg.getBoundingClientRect();
+  view.h = view.w * (r.height || 1) / (r.width || 1);
+  svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
+
+  svg.innerHTML = "";
+
+  // defs: grid
+  const defs = svgEl("defs");
+  defs.innerHTML = `
+    <pattern id="g6" width="6" height="6" patternUnits="userSpaceOnUse">
+      <path d="M6 0 L0 0 0 6" fill="none" stroke="var(--grid)" stroke-width="0.18"/>
+    </pattern>
+    <pattern id="g12" width="12" height="12" patternUnits="userSpaceOnUse">
+      <rect width="12" height="12" fill="url(#g6)"/>
+      <path d="M12 0 L0 0 0 12" fill="none" stroke="var(--grid-major)" stroke-width="0.35"/>
+    </pattern>`;
+  svg.appendChild(defs);
+
+  // rooms — the active one, or every one on the whole-floor tab
+  const rooms = activeSpace() ? [activeSpace()] : S.spaces;
+  const R = floorBounds(rooms);
+  rooms.forEach(sp => {
+    const g = svgEl("g", {transform:`translate(${sp.x} ${sp.y})`, "data-id":sp.id, "data-kind":"space"},
+                    "space" + (sel && sel.id === sp.id ? " sel" : ""));
+    g.appendChild(svgEl("rect", {x:0, y:0, width:sp.w, height:sp.d}, "floor"));
+    g.appendChild(svgEl("rect", {x:0, y:0, width:sp.w, height:sp.d, fill:"url(#g12)", stroke:"none"}, "gridfill"));
+    /* the name sits above the room so equipment along the back wall can't bury it */
+    const t = svgEl("text", {x:1, y:-3.5}, "roomlbl");
+    t.textContent = `${sp.name.toUpperCase()}   ${fmtIn(sp.w)} × ${fmtIn(sp.d)}`;
+    g.appendChild(t);
+    if (sel && sel.id === sp.id)
+      g.appendChild(svgEl("circle", {cx:sp.w, cy:sp.d, r:2.6, "data-handle":"1"}, "handle"));
+    svg.appendChild(g);
+  });
+
+  // rulers along top & left of the whole drawing, every foot
+  const ruler = svgEl("g", {}, "anno");
+  const f0 = Math.floor(R.x0/12)*12, f1 = Math.ceil(R.x1/12)*12;
+  const g0 = Math.floor(R.y0/12)*12, g1 = Math.ceil(R.y1/12)*12;
+  for (let x = f0; x <= f1; x += 12){
+    const major = x % 60 === 0;
+    ruler.appendChild(svgEl("line", {x1:x, y1:R.y0-3, x2:x, y2:R.y0 - (major ? 9 : 6)}, "tick"));
+    if (major) {
+      const t = svgEl("text", {x:x+1.5, y:R.y0-10}, "ticklbl");
+      t.textContent = (x/12) + "'";
+      ruler.appendChild(t);
+    }
+  }
+  for (let y = g0; y <= g1; y += 12){
+    const major = y % 60 === 0;
+    ruler.appendChild(svgEl("line", {x1:R.x0-3, y1:y, x2:R.x0 - (major ? 9 : 6), y2:y}, "tick"));
+    if (major){
+      const t = svgEl("text", {x:R.x0-11, y:y+3, "text-anchor":"end"}, "ticklbl");
+      t.textContent = (y/12) + "'";
+      ruler.appendChild(t);
+    }
+  }
+  svg.appendChild(ruler);
+
+  // counter runs
+  viewRuns().forEach(rn => {
+    const g = svgEl("g", {transform:`translate(${rn.x} ${rn.y}) rotate(${rn.rot||0} ${rn.w/2} ${rn.d/2})`,
+                          "data-id":rn.id, "data-kind":"run"},
+                    "run" + (sel && sel.id === rn.id ? " sel" : ""));
+    g.appendChild(svgEl("rect", {x:0, y:0, width:rn.w, height:rn.d, rx:0.5}, "top"));
+    const lbl = svgEl("text", {x:2.5, y:5});
+    const full = `${rn.name.toUpperCase()}  ${fmtIn(rn.w)} × ${fmtIn(rn.d)}`;
+    lbl.textContent = full.length * 2.7 < rn.w - 4 ? full : fitText(rn.name.toUpperCase(), rn.w - 4);
+    g.appendChild(lbl);
+    if (sel && sel.id === rn.id){
+      g.appendChild(svgEl("circle", {cx:rn.w, cy:rn.d, r:2.6, "data-handle":"1"}, "handle"));
+    }
+    svg.appendChild(g);
+  });
+
+  // items: under first, then top
+  const clashes = clashSet();
+  const order = viewItems().sort((a,b) => (a.layer === "under" ? 0 : 1) - (b.layer === "under" ? 0 : 1));
+  order.forEach(it => {
+    const visible = S.layer === "both" || S.layer === it.layer;
+    if (!visible) return;
+    const ghost = S.layer === "both" && it.layer === "under";
+    let cls = "item " + it.layer + (ghost ? " ghost" : "");
+    if (sel && sel.id === it.id) cls += " sel";
+    if (clashes.has(it.id)) cls += " clash";
+    const g = svgEl("g", {transform:`translate(${it.x} ${it.y}) rotate(${it.rot||0} ${it.w/2} ${it.d/2})`,
+                          "data-id":it.id, "data-kind":"item"}, cls);
+    g.appendChild(svgEl("rect", {
+      x:0, y:0, width:it.w, height:it.d, rx:0.8,
+      fill:`color-mix(in srgb, ${catVar(it.c)} 26%, var(--sheet))`,
+      stroke:catVar(it.c)
+    }, "body"));
+
+    /* With both layers on screen the two label sets would sit on top of each
+       other, so countertop names ride high in the box and undercounter names
+       ride low. */
+    const short = it.name.replace(/ \(.*\)/,"").replace(/,.*$/,"");
+    const stacked = S.layer === "both";
+    let ly = it.d/2 + 1.6;
+    if (stacked) ly = ghost ? it.d - 2.2 : Math.min(it.d/2 + 1.6, 5.6);
+    const t1 = svgEl("text", {x:it.w/2, y:ly, fill:"var(--ink)"}, "lbl");
+    t1.textContent = fitText(short, it.w);
+    g.appendChild(t1);
+    if (it.d > 12 && !stacked){
+      const t2 = svgEl("text", {x:it.w/2, y:ly + 5, fill:"var(--ink-2)"}, "sz");
+      t2.textContent = `${it.w}×${it.d}`;
+      g.appendChild(t2);
+    }
+    /* a corner dot marks anything not yet in hand */
+    if (it.status && it.status !== "have" && it.w > 5 && it.d > 5){
+      g.appendChild(svgEl("circle", {cx:it.w - 3, cy:3, r:1.9,
+        fill:`var(${STATUS[it.status].v})`, stroke:"var(--sheet)", "stroke-width":0.5}, "statusdot"));
+    }
+    /* K-3 item number, so the plan reads against the health-dept sheet */
+    if (it.no && it.w > 7 && it.d > 7){
+      g.appendChild(svgEl("circle", {cx:3.4, cy:3.4, r:2.7, fill:"var(--sheet)", stroke:catVar(it.c),
+                                     "stroke-width":0.6}, "nobadge"));
+      const tn = svgEl("text", {x:3.4, y:4.5, fill:catVar(it.c)}, "notxt");
+      tn.textContent = it.no;
+      g.appendChild(tn);
+    }
+    svg.appendChild(g);
+  });
+
+  drawAnnotations();
+  renderTabs(); renderProps(); renderRunStats(); renderFlags(); renderSchedule(); renderLegend();
+  renderRoomList(); renderBuying();
+}
+
+/* What's bought, what isn't, and what the rest costs — for the space you're
+   looking at, and for the whole job. */
+function renderBuying(){
+  const box = $("buying");
+  const here = viewItems();
+  const sum = list => list.reduce((s,i) => s + (i.p || 0), 0);
+  const by = (list, k) => list.filter(i => i.status === k);
+  const sp = activeSpace();
+  const need = by(here, "toorder"), ord = by(here, "ordered"), have = by(here, "have");
+  const allNeed = by(S.items, "toorder");
+
+  const line = (k, list) => `<div class="stat">
+      <span class="k"><b class="tag ${k}">${STATUS[k].short}</b> ${STATUS[k].label}</span>
+      <span class="v">${list.length}${sum(list) ? " · $" + sum(list).toLocaleString() : ""}</span>
+    </div>`;
+
+  box.innerHTML =
+    line("toorder", need) + line("ordered", ord) + line("have", have) +
+    (need.length ? `<div class="tolist">${need.sort((a,b) => (b.p||0)-(a.p||0)).map(i =>
+      `<div class="torow"><span>${i.no ? `<b class="itemno">${escapeHtml(i.no)}</b>` : ""}${escapeHtml(i.name)}</span>
+       <span class="v">${i.p ? "$" + i.p.toLocaleString() : "—"}</span></div>`).join("")}</div>` : "")
+    + (sp ? `<div class="stat" style="margin-top:8px"><span class="k">Whole job, still to order</span>
+             <span class="v">${allNeed.length} · $${sum(allNeed).toLocaleString()}</span></div>` : "")
+    + `<p class="hint" style="padding:8px 0 0">Started from your purchase list: everything on it is “need to order”, everything else on K-3 is “have”. Click any piece and change it.</p>`;
+}
+
+function renderRoomList(){
+  const box = $("roomList");
+  if (!box) return;
+  box.innerHTML = S.spaces.map(sp => {
+    const n = S.items.filter(i => centerIn(i, sp)).length;
+    return `<div class="stat"><span class="k">${escapeHtml(sp.name)}</span>
+            <span class="v">${fmtIn(sp.w)} × ${fmtIn(sp.d)} · ${n}</span></div>`;
+  }).join("");
+}
+
+function floorBounds(rooms){
+  const list = rooms.length ? rooms : S.spaces;
+  return {
+    x0:Math.min(...list.map(s => s.x)),      y0:Math.min(...list.map(s => s.y)),
+    x1:Math.max(...list.map(s => s.x + s.w)), y1:Math.max(...list.map(s => s.y + s.d))
+  };
+}
+
+function renderTabs(){
+  const bar = $("spaceTabs");
+  bar.innerHTML = "";
+  const mk = (id, label, count) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.setAttribute("aria-current", String(S.space === id));
+    b.innerHTML = `${escapeHtml(label)}${count == null ? "" : `<span class="cnt">${count}</span>`}`;
+    b.addEventListener("click", () => setSpace(id));
+    bar.appendChild(b);
+  };
+  S.spaces.filter(s => s.tab !== 0 || S.space === s.id).forEach(sp =>
+    mk(sp.id, sp.name, S.items.filter(i => centerIn(i, sp)).length));
+  mk("all", "Whole floor", S.items.length);
+  const sp = document.createElement("span");
+  sp.className = "spacer";
+  bar.appendChild(sp);
+}
+
+function setSpace(id){
+  S.space = id;
+  const o = selObj();
+  if (o && !inView(o) && o.kind !== "space") sel = null;
+  persist(); fit();
+  const sp = activeSpace();
+  status(sp ? `Showing ${sp.name}. New equipment lands in this room.` : "Showing every space on one floor plan.");
+}
+
+function fitText(txt, w){
+  const max = Math.max(3, Math.floor(w / 2.3));
+  return txt.length > max ? txt.slice(0, max-1) + "…" : txt;
+}
+
+/* dimension lines from the selected item to its counter's edges */
+function drawAnnotations(){
+  const o = selObj();
+  if (!o || o.kind !== "item") return;
+  const rn = runUnder(o);
+  if (!rn) return;
+  const g = svgEl("g", {}, "anno");
+  const ob = bbox(o), rb = bbox(rn);
+  const midY = (ob.y0 + ob.y1)/2, midX = (ob.x0 + ob.x1)/2;
+  const pairs = [
+    [rb.x0, midY, ob.x0, midY, ob.x0 - rb.x0, "h"],
+    [ob.x1, midY, rb.x1, midY, rb.x1 - ob.x1, "h"],
+    [midX, rb.y0, midX, ob.y0, ob.y0 - rb.y0, "v"],
+    [midX, ob.y1, midX, rb.y1, rb.y1 - ob.y1, "v"]
+  ];
+  pairs.forEach(([x1,y1,x2,y2,val,dir]) => {
+    if (val <= 0.4) return;
+    g.appendChild(svgEl("line", {x1, y1, x2, y2}, "dimline"));
+    const tx = (x1+x2)/2, ty = (y1+y2)/2;
+    const t = svgEl("text", {x:tx, y: dir === "h" ? ty - 1.6 : ty, transform: dir === "v" ? `rotate(-90 ${tx} ${ty})` : ""}, "dimtxt");
+    t.textContent = fmtIn(val);
+    g.appendChild(t);
+  });
+  svg.appendChild(g);
+}
+
+function clashSet(){
+  const out = new Set();
+  for (let i=0;i<S.items.length;i++){
+    for (let j=i+1;j<S.items.length;j++){
+      const a = S.items[i], b = S.items[j];
+      if (a.layer !== b.layer) continue;
+      if (a.c === "open" || b.c === "open") continue;
+      /* a piece that stands on top of other equipment shares that footprint on
+         purpose — a plan view can't show the second storey */
+      if (a.mount === "stacked" || b.mount === "stacked") continue;
+      if (overlaps(a,b)){ out.add(a.id); out.add(b.id); }
+    }
+  }
+  return out;
+}
+
+function renderLegend(){
+  const used = new Set(S.items.map(i => i.c));
+  $("legend").innerHTML = Object.keys(CATS).filter(c => used.has(c)).map(c =>
+    `<span class="badge"><i style="background:color-mix(in srgb, ${catVar(c)} 45%, transparent); border:1px solid ${catVar(c)}"></i>${CATS[c].label}</span>`
+  ).join("") || `<span>Add equipment to begin</span>`;
+}
+
+/* ============================================================
+   7. Right rail
+   ============================================================ */
+function renderProps(){
+  const box = $("props");
+  const o = selObj();
+  if (!o){
+    box.innerHTML = `<div class="card"><h3>Selection</h3><p class="empty">Nothing selected. Click a piece of equipment or a counter run on the plan.</p></div>`;
+    return;
+  }
+  const isSpace = o.kind === "space";
+  const isRun = o.kind === "run" || isSpace;
+  box.innerHTML = `
+    <div class="card">
+      <h3>${isSpace ? "Room" : o.kind === "run" ? "Counter run" : (o.no ? "Item " + escapeHtml(o.no) : "Equipment")}</h3>
+      <div class="row"><label for="pName">Name</label><input type="text" id="pName" value="${escapeAttr(o.name)}"></div>
+      ${o.model ? `<p class="modelline">${escapeHtml(o.model)}${o.p ? ` · $${o.p.toLocaleString()}` : ""}</p>` : ""}
+      ${o.note ? `<p class="notaline">${escapeHtml(o.note)}</p>` : ""}
+      ${isRun ? "" : `<div class="seg statseg" id="pStatus" role="group" aria-label="Purchasing status">
+        ${Object.keys(STATUS).map(k =>
+          `<button data-status="${k}" aria-pressed="${o.status === k}">${STATUS[k].label}</button>`).join("")}
+      </div>`}
+      ${isRun ? "" : `<div class="row"><label for="pLayer">Layer</label>
+        <select id="pLayer" style="flex:1">
+          <option value="top"${o.layer==="top"?" selected":""}>On the countertop</option>
+          <option value="under"${o.layer==="under"?" selected":""}>Under the counter</option>
+        </select></div>`}
+      <div class="grid2">
+        <span class="field"><label for="pW">W</label><input type="number" id="pW" step="0.5" min="1" value="${o.w}"></span>
+        <span class="field"><label for="pD">D</label><input type="number" id="pD" step="0.5" min="1" value="${o.d}"></span>
+        <span class="field"><label for="pX">X</label><input type="number" id="pX" step="0.5" value="${round(o.x,0.5)}"></span>
+        <span class="field"><label for="pY">Y</label><input type="number" id="pY" step="0.5" value="${round(o.y,0.5)}"></span>
+      </div>
+      <div class="row" style="margin-top:9px; gap:6px">
+        <button class="btn" id="pRot">Rotate 90°</button>
+        ${isRun ? "" : `<button class="btn" id="pDup">Duplicate</button>`}
+        <button class="btn" id="pDel">Delete</button>
+      </div>
+      <div class="stat" style="margin-top:8px"><span class="k">Footprint</span><span class="v">${fmtIn(o.w)} × ${fmtIn(o.d)}</span></div>
+      ${isRun ? "" : `<div class="stat"><span class="k">Sits on</span><span class="v">${o.mount === "stacked" ? "another unit" : o.mount === "floor" ? "the floor" : runUnder(o) ? escapeHtml(runUnder(o).name) : "— off counter —"}</span></div>`}
+      ${isRun || !o.h ? "" : `<div class="stat"><span class="k">Height</span><span class="v">${fmtIn(o.h)}</span></div>`}
+      ${isRun || !o.est ? "" : `<div class="stat"><span class="k">Footprint source</span><span class="v">spec sheet ≈</span></div>`}
+    </div>`;
+
+  const commit = (fn) => () => { fn(); snapshot(); render(); };
+  $("pName").addEventListener("change", e => { o.name = e.target.value || o.name; snapshot(); render(); });
+  const num = (id, key) => $(id).addEventListener("change", e => {
+    const v = parseFloat(e.target.value);
+    if (!isNaN(v)) o[key] = (key === "w" || key === "d") ? Math.max(1, v) : v;
+    snapshot(); render();
+  });
+  num("pW","w"); num("pD","d"); num("pX","x"); num("pY","y");
+  if (!isRun) $("pLayer").addEventListener("change", e => { o.layer = e.target.value; snapshot(); render(); });
+  if (!isRun) $("pStatus").addEventListener("click", e => {
+    const b = e.target.closest("button[data-status]");
+    if (!b) return;
+    o.status = b.dataset.status;
+    snapshot(); render();
+  });
+  $("pRot").addEventListener("click", commit(() => rotate(o)));
+  $("pDel").addEventListener("click", commit(() => del(o)));
+  if (!isRun) $("pDup").addEventListener("click", commit(() => duplicate(o)));
+}
+
+function renderRunStats(){
+  const box = $("runStats");
+  const runs = viewRuns();
+  if (!runs.length){
+    const floorCount = viewItems().length;
+    box.innerHTML = `<p class="empty">No counter runs in this space — the ${floorCount} ${floorCount === 1 ? "piece" : "pieces"} here stand on the floor. Add a run from the toolbar if you want to model a counter.</p>`;
+    return;
+  }
+  let totalLen = 0;
+  box.innerHTML = runs.map(rn => {
+    totalLen += rn.w;
+    const topPct = clamp(occupancy(rn, "top") / rn.w * 100, 0, 100);
+    const unPct  = clamp(occupancy(rn, "under") / rn.w * 100, 0, 100);
+    const free   = Math.max(0, rn.w - occupancy(rn, "top"));
+    return `<div class="runline">
+      <div class="nm"><b>${escapeHtml(rn.name)}</b><span>${fmtIn(rn.w)} × ${fmtIn(rn.d)}</span></div>
+      <div class="meter"><i class="top" style="width:${topPct}%"></i></div>
+      <div class="nm"><span>top ${topPct.toFixed(0)}% used</span><span>${fmtIn(free)} free</span></div>
+      <div class="meter"><i class="under" style="width:${unPct}%"></i></div>
+      <div class="nm"><span>under ${unPct.toFixed(0)}% used</span><span>${fmtIn(Math.max(0, rn.w - occupancy(rn,"under")))} free</span></div>
+    </div>`;
+  }).join("") + `<div class="stat"><span class="k">Total counter</span><span class="v">${fmtFt(totalLen)}</span></div>`;
+}
+
+/* length of a run consumed by items sitting on it (projected onto its long axis) */
+function occupancy(rn, layer){
+  const spans = [];
+  const a = -(rn.rot||0) * Math.PI/180, cos = Math.cos(a), sin = Math.sin(a);
+  const cx = rn.x + rn.w/2, cy = rn.y + rn.d/2;
+  S.items.filter(i => i.layer === layer && i.c !== "open" && runUnder(i) === rn).forEach(i => {
+    const pts = corners(i).map(([px,py]) => {
+      const dx = px-cx, dy = py-cy;
+      return cx + dx*cos - dy*sin;
+    });
+    spans.push([Math.min(...pts), Math.max(...pts)]);
+  });
+  spans.sort((p,q) => p[0]-q[0]);
+  let total = 0, cur = null;
+  spans.forEach(s => {
+    if (!cur || s[0] > cur[1]){ if (cur) total += cur[1]-cur[0]; cur = s.slice(); }
+    else cur[1] = Math.max(cur[1], s[1]);
+  });
+  if (cur) total += cur[1]-cur[0];
+  return total;
+}
+
+function renderFlags(){
+  const clashes = clashSet();
+  const here = viewItems();
+  /* floor-standing kitchen gear, and anything stacked on another unit, isn't
+     expected to sit on a counter run */
+  const off = here.filter(i => i.mount !== "floor" && i.mount !== "stacked" && !runUnder(i));
+  const overhang = here.filter(i => {
+    const rn = runUnder(i); if (!rn) return false;
+    return corners(i).some(([px,py]) => !pointInRect(px, py, rn));
+  });
+  const rows = [];
+  const piece = n => n === 1 ? "piece" : "pieces";
+  const clashHere = here.filter(i => clashes.has(i.id)).length;
+  if (clashHere) rows.push(`<div class="flag bad"><b>${clashHere}</b><span>${piece(clashHere)} overlap something else on the same layer — outlined in red.</span></div>`);
+  if (off.length)   rows.push(`<div class="flag warn"><b>${off.length}</b><span>${piece(off.length)} off any counter run: ${off.slice(0,3).map(i=>escapeHtml(i.name)).join(", ")}${off.length>3?"…":""}</span></div>`);
+  if (overhang.length) rows.push(`<div class="flag warn"><b>${overhang.length}</b><span>${piece(overhang.length)} hang over a counter edge — check the depth.</span></div>`);
+  const deep = here.filter(i => { const rn = runUnder(i); return rn && i.d > rn.d; });
+  if (deep.length) rows.push(`<div class="flag warn"><b>${deep.length}</b><span>${piece(deep.length)} deeper than the counter they sit on.</span></div>`);
+  const stray = here.filter(i => !spaceOf(i));
+  if (stray.length) rows.push(`<div class="flag warn"><b>${stray.length}</b><span>${piece(stray.length)} outside every room outline.</span></div>`);
+  if (!rows.length) rows.push(`<div class="flag ok"><b>OK</b><span>Nothing overlaps${off.length || here.some(i => i.mount !== "floor") ? ", everything lands where it should" : " in this space"}.</span></div>`);
+  $("flags").innerHTML = rows.join("");
+}
+
+function renderSchedule(){
+  const box = $("schedule");
+  const here = viewItems();
+  if (!here.length){ box.innerHTML = `<p class="empty">No equipment in this space yet.</p>`; return; }
+  const make = layer => {
+    const rows = {};
+    here.filter(i => i.layer === layer).forEach(i => {
+      const k = `${i.name}|${i.w}x${i.d}`;
+      rows[k] = rows[k] || {n:i.name, no:i.no || "", model:i.model || "", est:i.est, w:i.w, d:i.d, c:i.c, status:i.status, q:0};
+      rows[k].q++;
+    });
+    const list = Object.values(rows).sort((a,b) =>
+      (parseFloat(a.no) || 999) - (parseFloat(b.no) || 999) || a.n.localeCompare(b.n));
+    if (!list.length) return "";
+    return `<table class="sched"><thead><tr>
+        <th>Qty</th><th>${layer === "top" ? "Countertop" : "Undercounter"}</th><th style="text-align:right">Size</th>
+      </tr></thead><tbody>${list.map(r =>
+        `<tr><td class="q">${r.q}</td>
+             <td>${r.no ? `<b class="itemno">${escapeHtml(r.no)}</b>` : `<span class="swatch" style="display:inline-block;background:${catVar(r.c)};margin-right:6px"></span>`}${escapeHtml(r.n)}${r.status && r.status !== "have" ? ` <b class="tag ${r.status}">${STATUS[r.status].short}</b>` : ""}${r.model ? `<em class="model">${escapeHtml(r.model)}</em>` : ""}</td>
+             <td class="sz">${r.est ? "≈" : ""}${r.w}×${r.d}</td></tr>`).join("")}</tbody></table>`;
+  };
+  const cost = here.reduce((s,i) => s + (i.p || 0), 0);
+  const priced = here.filter(i => i.p).length;
+  box.innerHTML = make("top") + (make("top") && make("under") ? `<div style="height:10px"></div>` : "") + make("under")
+    + (cost ? `<div class="stat" style="margin-top:9px"><span class="k">Est. cost, ${priced} priced ${priced === 1 ? "item" : "items"}</span>
+               <span class="v">$${cost.toLocaleString(undefined,{maximumFractionDigits:0})}</span></div>` : "");
+}
+
+const escapeHtml = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const escapeAttr = s => String(s).replace(/"/g, "&quot;");
+
+/* ============================================================
+   8. Edit operations
+   ============================================================ */
+/* Rotating in plan view = turning the footprint a quarter turn about its own
+   centre. Swapping W and D keeps everything axis-aligned, so labels stay
+   readable and the fit checks stay exact. */
+function rotate(o){
+  const cx = o.x + o.w/2, cy = o.y + o.d/2;
+  const w = o.w; o.w = o.d; o.d = w;
+  o.rot = 0;
+  o.x = round(cx - o.w/2, S.snap); o.y = round(cy - o.d/2, S.snap);
+}
+function del(o){
+  if (o.kind === "space"){
+    S.spaces = S.spaces.filter(s => s.id !== o.id);
+    if (S.space === o.id) S.space = "all";
+  }
+  else if (o.kind === "run") S.runs = S.runs.filter(r => r.id !== o.id);
+  else S.items = S.items.filter(i => i.id !== o.id);
+  sel = null;
+}
+function duplicate(o){
+  const copy = Object.assign({}, o, {id:nid(), x:o.x + 6, y:o.y + 6});
+  if (o.kind === "space") S.spaces.push(copy);
+  else if (o.kind === "run") S.runs.push(copy);
+  else S.items.push(copy);
+  sel = {kind:o.kind, id:copy.id};
+}
+
+/* ============================================================
+   9. Pointer interaction
+   ============================================================ */
+function toWorld(evt){
+  const pt = svg.createSVGPoint();
+  pt.x = evt.clientX; pt.y = evt.clientY;
+  const m = svg.getScreenCTM();
+  if (!m) return {x:0, y:0};
+  const p = pt.matrixTransform(m.inverse());
+  return {x:p.x, y:p.y};
+}
+
+let drag = null;
+
+svg.addEventListener("pointerdown", e => {
+  const g = e.target.closest("g[data-id]");
+  const p = toWorld(e);
+  try{ svg.setPointerCapture(e.pointerId); }catch(err){ /* pointer already gone */ }
+
+  if (e.target.hasAttribute && e.target.hasAttribute("data-handle") && sel){
+    const o = selObj();
+    drag = {mode:"resize", id:o.id, ox:o.x, oy:o.y};
+    return;
+  }
+  if (g){
+    const o = find(g.getAttribute("data-id"));
+    if (!o) return;
+    sel = {kind:o.kind, id:o.id};
+    drag = {mode:"move", id:o.id, dx:p.x - o.x, dy:p.y - o.y, el:null, moved:false, ox:o.x, oy:o.y};
+    /* moving a room takes its contents with it */
+    if (o.kind === "space")
+      drag.riders = S.runs.concat(S.items).filter(c => centerIn(c, o)).map(c => ({o:c, x:c.x, y:c.y}));
+    render();                                   // rebuilds the sheet…
+    drag.el = svg.querySelector(`g[data-id="${o.id}"]`);   // …so re-grab the live node
+    return;
+  }
+  sel = null;
+  drag = {mode:"pan", sx:e.clientX, sy:e.clientY, vx:view.x, vy:view.y};
+  svg.classList.add("panning");
+  render();
+});
+
+svg.addEventListener("pointermove", e => {
+  const p = toWorld(e);
+  $("statusCoord").textContent = `x ${fmtIn(p.x)}   y ${fmtIn(p.y)}`;
+  if (!drag) return;
+
+  if (drag.mode === "pan"){
+    const r = svg.getBoundingClientRect();
+    const k = view.w / r.width;
+    view.x = drag.vx - (e.clientX - drag.sx) * k;
+    view.y = drag.vy - (e.clientY - drag.sy) * k;
+    svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
+    return;
+  }
+  const o = find(drag.id);
+  if (!o) return;
+  svg.classList.add("dragging");
+
+  if (drag.mode === "move"){
+    o.x = round(p.x - drag.dx, S.snap);
+    o.y = round(p.y - drag.dy, S.snap);
+    drag.moved = true;
+    if (drag.riders){
+      const ddx = o.x - drag.ox, ddy = o.y - drag.oy;
+      drag.riders.forEach(r => { r.o.x = r.x + ddx; r.o.y = r.y + ddy; });
+      render();
+      return;
+    }
+    if (drag.el) drag.el.setAttribute("transform", `translate(${o.x} ${o.y}) rotate(${o.rot||0} ${o.w/2} ${o.d/2})`);
+  } else if (drag.mode === "resize"){
+    o.w = Math.max(6, round(p.x - o.x, S.snap || 1));
+    o.d = Math.max(6, round(p.y - o.y, S.snap || 1));
+    render();
+  }
+});
+
+function endDrag(e){
+  if (!drag) return;
+  const wasMove = drag.mode !== "pan";
+  svg.classList.remove("dragging","panning");
+  drag = null;
+  if (wasMove) snapshot();
+  render();
+}
+svg.addEventListener("pointerup", endDrag);
+svg.addEventListener("pointercancel", endDrag);
+
+/* Scrolling slides the drawing around; zoom is a deliberate gesture —
+   trackpad pinch (which arrives as ctrl+wheel) or ⌘-scroll. */
+svg.addEventListener("wheel", e => {
+  e.preventDefault();
+  const r = svg.getBoundingClientRect();
+  const perPx = view.w / (r.width || 1);
+  const scale = e.deltaMode === 1 ? 16 : (e.deltaMode === 2 ? r.height : 1);
+  const dx = e.deltaX * scale, dy = e.deltaY * scale;
+
+  if (e.ctrlKey || e.metaKey){
+    const p = toWorld(e);
+    /* cap one event's effect so a mouse notch doesn't jump the scale */
+    const nw = clamp(view.w * Math.exp(clamp(dy, -60, 60) * 0.004), 24, 1400);
+    const ratio = nw / view.w;
+    view.x = p.x - (p.x - view.x) * ratio;
+    view.y = p.y - (p.y - view.y) * ratio;
+    view.w = nw;
+    view.h = view.h * ratio;
+    svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
+    clearTimeout(wheelSettle);
+    wheelSettle = setTimeout(render, 120);
+    return;
+  }
+  view.x += dx * perPx;
+  view.y += dy * perPx;
+  svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
+}, {passive:false});
+let wheelSettle;
+
+/* ============================================================
+   10. Keyboard
+   ============================================================ */
+document.addEventListener("keydown", e => {
+  const tag = (e.target.tagName || "").toLowerCase();
+  if (tag === "input" || tag === "textarea" || tag === "select") return;
+  const meta = e.metaKey || e.ctrlKey;
+
+  if (meta && e.key.toLowerCase() === "z"){
+    e.preventDefault();
+    e.shiftKey ? applyHist(hpos+1) : applyHist(hpos-1);
+    return;
+  }
+  const o = selObj();
+  if (meta && e.key.toLowerCase() === "d" && o){ e.preventDefault(); duplicate(o); snapshot(); render(); return; }
+  if (!o) return;
+  if (e.key === "Backspace" || e.key === "Delete"){ e.preventDefault(); del(o); snapshot(); render(); return; }
+  if (e.key.toLowerCase() === "r"){ e.preventDefault(); rotate(o); snapshot(); render(); return; }
+  const step = e.shiftKey ? 12 : (S.snap || 1);
+  const moves = {ArrowLeft:[-step,0], ArrowRight:[step,0], ArrowUp:[0,-step], ArrowDown:[0,step]};
+  if (moves[e.key]){
+    e.preventDefault();
+    o.x += moves[e.key][0]; o.y += moves[e.key][1];
+    snapshot(); render();
+  }
+});
+
+/* ============================================================
+   11. Toolbar wiring
+   ============================================================ */
+$("layerSeg").addEventListener("click", e => {
+  const b = e.target.closest("button[data-layer]");
+  if (!b) return;
+  S.layer = b.dataset.layer;
+  [...$("layerSeg").children].forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  persist(); render();
+});
+$("libSeg").addEventListener("click", e => {
+  const b = e.target.closest("button[data-lib]");
+  if (!b) return;
+  S.libTab = b.dataset.lib;
+  [...$("libSeg").children].forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  persist(); renderPalette();
+});
+$("snap").addEventListener("change", e => { S.snap = parseFloat(e.target.value); status(S.snap ? `Snapping to ${S.snap}"` : "Free placement"); });
+$("addRun").addEventListener("click", () => {
+  const rn = {id:nid(), kind:"run", name:`Counter run ${S.runs.length+1}`,
+              x:round(view.x + view.w*0.15, 6), y:round(view.y + view.h*0.5, 6), w:120, d:30, rot:0};
+  S.runs.push(rn);
+  sel = {kind:"run", id:rn.id};
+  snapshot(); render();
+  status("Counter run added — drag it, or set exact size on the right.");
+});
+$("undo").addEventListener("click", () => applyHist(hpos-1));
+$("redo").addEventListener("click", () => applyHist(hpos+1));
+$("printBtn").addEventListener("click", () => window.print());
+$("zoomIn").addEventListener("click", () => zoomBy(1/1.25));
+$("zoomOut").addEventListener("click", () => zoomBy(1.25));
+$("zoomFit").addEventListener("click", fit);
+/* zoom about the middle of what you're looking at, not the corner */
+function zoomBy(k){
+  const cx = view.x + view.w/2, cy = view.y + view.h/2;
+  const nw = clamp(view.w * k, 24, 1400);
+  const ratio = nw / view.w;
+  view.w = nw; view.h = view.h * ratio;
+  view.x = cx - view.w/2; view.y = cy - view.h/2;
+  render();
+}
+
+$("addRoom").addEventListener("click", () => {
+  const b = floorBounds(S.spaces);
+  const sp = {id:nid(), kind:"space", key:"custom" + S.spaces.length, name:`Room ${S.spaces.length + 1}`,
+              x:round(b.x1 + 24, 6), y:round(b.y0, 6), w:120, d:96, rot:0, tab:1};
+  S.spaces.push(sp);
+  sel = {kind:"space", id:sp.id};
+  snapshot(); render();
+  status("Room added — drag it, or set its size on the right.");
+});
+
+/* add-your-own equipment. Anything entered here is a one-off on this layout —
+   it isn't added to the two library lists, which mirror the approved K-3
+   schedule and the purchase spreadsheet. */
+const cModal = $("customModal");
+$("cC").innerHTML = Object.keys(CATS)
+  .map(k => `<option value="${k}"${k === "service" ? " selected" : ""}>${CATS[k].label}</option>`).join("");
+$("cStatus").innerHTML = Object.keys(STATUS)
+  .map(k => `<option value="${k}"${k === "toorder" ? " selected" : ""}>${STATUS[k].label}</option>`).join("");
+$("addCustom").addEventListener("click", () => {
+  $("cErr").textContent = "";
+  cModal.setAttribute("open","");
+  $("cName").focus();
+});
+$("cCancel").addEventListener("click", () => cModal.removeAttribute("open"));
+cModal.addEventListener("click", e => { if (e.target === cModal) cModal.removeAttribute("open"); });
+cModal.addEventListener("keydown", e => {
+  if (e.key === "Escape") cModal.removeAttribute("open");
+  if (e.key === "Enter" && e.target.tagName.toLowerCase() === "input") $("cAdd").click();
+});
+$("cAdd").addEventListener("click", () => {
+  const name = $("cName").value.trim();
+  const w = parseFloat($("cW").value), d = parseFloat($("cD").value), h = parseFloat($("cH").value);
+  const fail = m => { $("cErr").textContent = m; };
+  if (!name) return fail("Give it a name, so you can tell what it is on the plan.");
+  if (!(w > 0) || !(d > 0)) return fail("Width and depth both have to be more than zero.");
+  const where = $("cMount").value;
+  addItem(where === "counter-under" ? "under" : "top", {
+    n:name, m:$("cModel").value.trim(), c:$("cC").value,
+    w, d, h:(h > 0 ? h : 0), est:1,
+    p:Math.max(0, parseFloat($("cP").value) || 0),
+    note:$("cNote").value.trim(),
+    mount:where === "floor" ? "floor" : where === "stacked" ? "stacked" : "counter",
+    status:$("cStatus").value
+  }, true);
+  cModal.removeAttribute("open");
+  ["cName","cModel","cP","cNote"].forEach(id => { $(id).value = ""; });
+  $("cErr").textContent = "";
+});
+
+/* save / load modal */
+const modal = $("modal");
+$("saveBtn").addEventListener("click", () => {
+  $("modalText").value = JSON.stringify({spaces:S.spaces, runs:S.runs, items:S.items}, null, 1);
+  modal.setAttribute("open","");
+});
+$("mClose").addEventListener("click", () => modal.removeAttribute("open"));
+modal.addEventListener("click", e => { if (e.target === modal) modal.removeAttribute("open"); });
+$("mCopy").addEventListener("click", async () => {
+  const t = $("modalText");
+  t.select();
+  try{ await navigator.clipboard.writeText(t.value); status("Layout copied to the clipboard."); }
+  catch(err){ document.execCommand("copy"); status("Layout copied."); }
+});
+$("mLoad").addEventListener("click", () => {
+  try{
+    const d = JSON.parse($("modalText").value);
+    if (!Array.isArray(d.runs) || !Array.isArray(d.items)) throw new Error("bad");
+    S.spaces = Array.isArray(d.spaces) && d.spaces.length ? d.spaces : S.spaces;
+    S.runs = d.runs; S.items = d.items;
+    uid = 900 + Math.floor(Math.random()*100);
+    S.space = "all";
+    sel = null; modal.removeAttribute("open");
+    snapshot(); fit();
+    status("Layout loaded.");
+  }catch(err){
+    status("That text isn't a saved layout — paste the whole block, including the braces.");
+  }
+});
+$("mReset").addEventListener("click", () => {
+  S = starter(); sel = null; modal.removeAttribute("open");
+  hist = []; hpos = -1; snapshot(); fit();
+  status("Started over with the sample bar.");
+});
+
+function status(msg){ $("statusMsg").textContent = msg; }
+
+/* ============================================================
+   12. View fitting + boot
+   ============================================================ */
+function fit(){
+  const sp = activeSpace();
+  const rooms = sp ? [sp] : S.spaces;
+  const b0 = floorBounds(rooms);
+  let x0 = b0.x0, y0 = b0.y0, x1 = b0.x1, y1 = b0.y1;
+  S.runs.concat(S.items).filter(inView).forEach(o => {
+    const b = bbox(o);
+    x0 = Math.min(x0, b.x0); y0 = Math.min(y0, b.y0);
+    x1 = Math.max(x1, b.x1); y1 = Math.max(y1, b.y1);
+  });
+  /* extra room on the left and top so the foot markers aren't clipped */
+  const padL = 38, padT = 26, padR = 18, padB = 18;
+  const r = svg.getBoundingClientRect();
+  const wNeeded = (x1 - x0) + padL + padR;
+  const hNeeded = (y1 - y0) + padT + padB;
+  const aspect = (r.width || 1) / (r.height || 1);
+  view.w = Math.max(wNeeded, hNeeded * aspect);
+  view.h = view.w / aspect;
+  view.x = x0 - padL - (view.w - wNeeded)/2;
+  view.y = y0 - padT - (view.h - hNeeded)/2;
+  render();
+}
+
+let rt;
+window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 120); });
+
+restore();
+[...$("layerSeg").children].forEach(x => x.setAttribute("aria-pressed", String(x.dataset.layer === S.layer)));
+[...$("libSeg").children].forEach(x => x.setAttribute("aria-pressed", String(x.dataset.lib === S.libTab)));
+$("snap").value = String(S.snap);
+renderPalette();
+snapshot();
+persist();   /* also tells you straight away whether saving works here */
+fit();
+
+})();
+</script>
+
+</body>
+</html>
