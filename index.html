@@ -299,7 +299,8 @@ kbd{
   border:1px solid var(--line); border-radius:6px; padding:9px;
   font-family:var(--font-mono); font-size:11px; line-height:1.5;
 }
-.modal .acts{display:flex; gap:8px; justify-content:flex-end; margin-top:11px}
+.modal .acts{display:flex; gap:8px; justify-content:flex-end; margin-top:11px; flex-wrap:wrap; align-items:center}
+.modal .acts .sp{margin-left:auto}
 .modal .form{display:grid; grid-template-columns:1fr 1fr; gap:9px 12px; overflow-y:auto}
 .modal .form label{display:flex; flex-direction:column; gap:4px; font-size:12px; color:var(--ink-2)}
 .modal .form label.wide{grid-column:1 / -1}
@@ -449,13 +450,19 @@ kbd{
 <div class="modal" id="modal">
   <div class="box">
     <h3 id="modalTitle">Save / Load</h3>
-    <p id="modalNote">Copy this text somewhere safe to keep a version of the layout. To bring a layout back, paste it in and press Load.</p>
+    <p id="modalNote"><b>Download a copy</b> gives you a layout file you can keep, email, or open on another
+      computer — the surest way to not lose work, because the browser's own memory is separate for every
+      site and every Chrome profile. The text below is the same thing as plain text, if you'd rather paste it.</p>
     <textarea id="modalText" spellcheck="false"></textarea>
+    <input type="file" id="mFile" accept=".json,application/json,text/plain" hidden>
     <div class="acts">
-      <button class="btn" id="mCopy">Copy</button>
-      <button class="btn" id="mLoad">Load pasted layout</button>
+      <button class="btn primary" id="mDownload">Download a copy</button>
+      <button class="btn" id="mOpen">Open a layout file…</button>
+      <span class="sp"></span>
+      <button class="btn" id="mCopy">Copy text</button>
+      <button class="btn" id="mLoad">Load pasted text</button>
       <button class="btn" id="mReset">Start over</button>
-      <button class="btn primary" id="mClose">Close</button>
+      <button class="btn" id="mClose">Close</button>
     </div>
   </div>
 </div>
@@ -1696,20 +1703,51 @@ $("mCopy").addEventListener("click", async () => {
   try{ await navigator.clipboard.writeText(t.value); status("Layout copied to the clipboard."); }
   catch(err){ document.execCommand("copy"); status("Layout copied."); }
 });
-$("mLoad").addEventListener("click", () => {
+/* One loader for both routes in: pasted text and an opened file. */
+function loadLayout(text, whatItWas){
   try{
-    const d = JSON.parse($("modalText").value);
+    const d = JSON.parse(text);
     if (!Array.isArray(d.runs) || !Array.isArray(d.items)) throw new Error("bad");
     S.spaces = Array.isArray(d.spaces) && d.spaces.length ? d.spaces : S.spaces;
     S.runs = d.runs; S.items = d.items;
+    S.items.forEach(i => { const r = i.no && PROJ(i.no); if (r) i.mount = r.mount || "counter"; });
     uid = 900 + Math.floor(Math.random()*100);
     S.space = "all";
     sel = null; modal.removeAttribute("open");
     snapshot(); fit();
-    status("Layout loaded.");
+    status(`Layout loaded — ${S.items.length} pieces.`);
+    return true;
   }catch(err){
-    status("That text isn't a saved layout — paste the whole block, including the braces.");
+    status(whatItWas === "file"
+      ? "That file isn't a saved layout. Pick the .json file the Download button made."
+      : "That text isn't a saved layout — paste the whole block, including the braces.");
+    return false;
   }
+}
+$("mLoad").addEventListener("click", () => loadLayout($("modalText").value, "text"));
+
+/* A layout as a real file. The browser's own memory is per-site and per-Chrome
+   profile, so a file is the only copy that travels. */
+$("mDownload").addEventListener("click", () => {
+  const d = new Date();
+  const stamp = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+  const blob = new Blob([$("modalText").value], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = `surfalatte-layout-${stamp}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  status(`Downloaded surfalatte-layout-${stamp}.json — keep it somewhere safe.`);
+});
+$("mOpen").addEventListener("click", () => $("mFile").click());
+$("mFile").addEventListener("change", e => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => loadLayout(String(r.result), "file");
+  r.onerror = () => status("Couldn't read that file.");
+  r.readAsText(f);
+  e.target.value = "";
 });
 $("mReset").addEventListener("click", () => {
   S = starter(); sel = null; modal.removeAttribute("open");
