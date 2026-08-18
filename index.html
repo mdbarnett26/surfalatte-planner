@@ -611,10 +611,10 @@ LIB.project = [
   {no:"42", n:"Condiment counter",        m:"HUD millwork",              c:"service", layer:"top",   w:36,   d:24,   h:36, est:1, run:"retail"},
   /* Not on the approved K-3 schedule — added Aug 2026. Ventless, so no hood,
      but it is added cooking equipment on a stamped plan. */
-  {no:"44", n:"Rapid-cook oven",          m:"TurboChef Eco (ECOH)",      c:"brew",    layer:"top",   w:16.125,d:23.5, h:21.5, p:8251, run:"boh", mount:"stacked",
-   note:"Sits on the work top (15) in the scullery. New scope: needs a dedicated 208-240V 20A circuit (L6-20P) run to the scullery, and a health-dept plan revision. Confirm TurboChef's clearances and the work top's load rating before committing."},
-  {no:"44a",n:"Rapid-cook oven (alt)",    m:"TurboChef Sota (SOTAM)",    c:"brew",    layer:"top",   w:16,   d:29.8, h:25, p:13717, alt:"44", run:"boh",
-   note:"Same cavity as the Eco but 6.3\" deeper and 30A. At 29.8\" deep it overhangs the 30\" work top with nothing to spare."},
+  {no:"44", n:"Rapid-cook oven",          m:"TurboChef Eco (ECOH)",      c:"brew",    layer:"top",   w:16.125,d:23.5, h:21.5, p:8251, run:"back",
+   note:"Sits on the back bar (16). At 23.5\" deep on a 24\" counter that leaves half an inch behind it — check TurboChef's required rear clearance for the catalytic exhaust. New scope: needs a dedicated 208-240V 20A circuit (L6-20P) run to the back bar, and a health-dept plan revision before install."},
+  {no:"44a",n:"Rapid-cook oven (alt)",    m:"TurboChef Sota (SOTAM)",    c:"brew",    layer:"top",   w:16,   d:29.8, h:25, p:13717, alt:"44", run:"back",
+   note:"Same cavity as the Eco but 6.3\" deeper and 30A. At 29.8\" deep it will not fit the 24\" back bar — it would overhang by almost 6\"."},
 
   /* Cost-saving alternates from the purchase list — drop one in beside the
      specified unit to see whether the swap still fits the millwork. */
@@ -1523,26 +1523,6 @@ const OWNER_LAYOUT = {
    "mount": "counter"
   },
   {
-   "id": "x58",
-   "kind": "item",
-   "layer": "under",
-   "name": "RO water storage tank",
-   "c": "water",
-   "no": "45",
-   "model": "RO Superstore 44 gal steel",
-   "est": 1,
-   "p": 590,
-   "note": "44 gal nominal, about 30 gal usable. Round tank 22\" across — the 22×22 footprint is the square it occupies. 1¼\" stainless connection; buffers the RO system (43). NOT on the approved K-3 schedule.",
-   "mount": "floor",
-   "status": "have",
-   "x": 391,
-   "y": 82,
-   "w": 22,
-   "d": 22,
-   "h": 36,
-   "rot": 0
-  },
-  {
    "id": "x59",
    "kind": "item",
    "layer": "top",
@@ -1552,8 +1532,8 @@ const OWNER_LAYOUT = {
    "model": "TurboChef Eco (ECOH)",
    "est": 0,
    "p": 8251,
-   "note": "New scope: needs a dedicated 208-240V 20A circuit (L6-20P) and a health-dept plan revision.",
-   "mount": "stacked",
+   "note": "Sits on the back bar (16). New scope: needs a dedicated 208-240V 20A circuit (L6-20P) run to the back bar, and a health-dept plan revision before install.",
+   "mount": "counter",
    "status": "toorder",
    "x": 418,
    "y": 80,
