@@ -647,6 +647,7 @@ const STATUS = {
    ============================================================ */
 const KEY = "coffee-bar-planner-v1";
 let uid = 1;
+let booted = false;   /* see snapshot(): start-up changes don't count as edits */
 const nid = () => "x" + (uid++);
 
 /* The service area as drawn on K-3: front counter along the retail side,
@@ -658,6 +659,12 @@ const nid = () => "x" + (uid++);
 /* The layout as the owner arranged it — exported 17 Aug 2026 and baked in, so
    the published link opens on their plan instead of a starting guess. Anything
    already saved in your own browser still takes precedence over this. */
+/* Bump this whenever OWNER_LAYOUT below changes. A visitor who has never moved
+   anything then picks up the new arrangement on their next visit instead of
+   being stuck on the copy their browser saved. Anyone who HAS made changes
+   keeps them — their own work always wins over a republish. */
+const LAYOUT_VERSION = "2026-08-17-d";
+
 const OWNER_LAYOUT = {
  "spaces": [
   {
@@ -1660,6 +1667,9 @@ function runUnder(item){
 function snapshot(){
   const copy = JSON.stringify({spaces:S.spaces, runs:S.runs, items:S.items, uid});
   if (hist[hpos] === copy) return;
+  /* the first snapshot is the baseline taken at start-up; anything after it is
+     the visitor actually changing the layout, which makes it theirs to keep */
+  if (booted) S.dirty = true;
   hist = hist.slice(0, hpos+1);
   hist.push(copy);
   if (hist.length > 60) hist.shift();
@@ -1685,7 +1695,8 @@ function updateHistBtns(){
    So report either way, in the bottom bar. */
 function persist(){
   let ok = true;
-  try{ localStorage.setItem(KEY, JSON.stringify({spaces:S.spaces, runs:S.runs, items:S.items, uid, layer:S.layer, libTab:S.libTab, space:S.space})); }
+  try{ localStorage.setItem(KEY, JSON.stringify({spaces:S.spaces, runs:S.runs, items:S.items, uid,
+       layer:S.layer, libTab:S.libTab, space:S.space, v:LAYOUT_VERSION, dirty:!!S.dirty})); }
   catch(e){ ok = false; }
   showSave(ok);
 }
@@ -1706,6 +1717,12 @@ function restore(){
     if (!raw) return false;
     const d = JSON.parse(raw);
     if (!d || !Array.isArray(d.runs) || !Array.isArray(d.items) || !Array.isArray(d.spaces)) return false;
+    /* An untouched copy of an older published layout is worth nothing — drop it
+       and take the new one. A save from before this check existed has no `v`,
+       so we can't tell whether it was edited: keep it. Never discard work we
+       can't prove is disposable. */
+    if (d.dirty === false && d.v !== LAYOUT_VERSION) return false;
+    S.dirty = d.dirty === true || !("v" in d);
     S.spaces = d.spaces; S.runs = d.runs; S.items = d.items;
     /* How a piece is supported is a fact about the equipment, not about this
        layout — so take it from the library, and a correction here reaches
@@ -2587,8 +2604,10 @@ $("mFile").addEventListener("change", e => {
 });
 $("mReset").addEventListener("click", () => {
   S = starter(); sel = null; modal.removeAttribute("open");
-  hist = []; hpos = -1; snapshot(); fit();
-  status("Started over with the sample bar.");
+  hist = []; hpos = -1; snapshot();
+  S.dirty = false; persist();   /* a clean copy of the published plan, not an edit */
+  fit();
+  status("Back to the published layout.");
 });
 
 function status(msg){ $("statusMsg").textContent = msg; }
@@ -2628,6 +2647,7 @@ restore();
 $("snap").value = String(S.snap);
 renderPalette();
 snapshot();
+booted = true;
 persist();   /* also tells you straight away whether saving works here */
 fit();
 
